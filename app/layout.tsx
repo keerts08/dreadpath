@@ -1,0 +1,29 @@
+import type { Metadata } from "next";
+import { Cinzel, IBM_Plex_Mono } from "next/font/google";
+import "./globals.css";
+
+const display = Cinzel({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: ["400", "600"],
+});
+
+const body = IBM_Plex_Mono({
+  variable: "--font-body",
+  subsets: ["latin"],
+  weight: ["400", "500"],
+});
+
+export const metadata: Metadata = {
+  title: "Ravenshade Manor",
+  description:
+    "You woke up somewhere you shouldn't be. Something else lives here.",
+};
+
+export default function RootLayout({ children }: LayoutProps<"/">) {
+  return (
+    <html lang="en" className={`${display.variable} ${body.variable} h-full`}>
+      <body className="min-h-full bg-void text-ink">{children}</body>
+    </html>
+  );
+}
