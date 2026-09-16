@@ -16,9 +16,8 @@ export default function HomeLayout({ children }: { children: ReactNode }) {
             <Image
               src="/blurhouse.png"
               alt="Horror House"
-              objectFit="cover"
-              layout="fill"
-              className="mask-[radial-gradient(circle,#000_10%,transparent_80%)] blur-sm"
+              fill
+              className="mask-[radial-gradient(circle,#000_10%,transparent_80%)] object-cover blur-sm"
             />
           </div>
           {children}
@@ -26,9 +25,8 @@ export default function HomeLayout({ children }: { children: ReactNode }) {
             <Image
               src="/forest-black.svg"
               alt="Forest"
-              objectFit="cover"
-              layout="fill"
-              className="-bottom-2"
+              fill
+              className="-bottom-2 object-cover"
             />
           </div>
         </div>
