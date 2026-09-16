@@ -21,7 +21,7 @@ export default function Home() {
 
             <div className="space-y-3">
               <button className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors">
-                NEW GAME
+                PLAY
               </button>
               <Dialog>
                 <DialogTrigger
