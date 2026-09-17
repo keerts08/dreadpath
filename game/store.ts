@@ -84,8 +84,22 @@ function recomputeDerivedFlags(
   flags: Record<string, boolean>,
   inventory: ItemId[],
 ) {
-  void flags;
-  void inventory;
+  const has = (id: ItemId) => inventory.includes(id);
+  flags.bothPagesRead = !!(flags.page1Read && flags.page2Read);
+  flags.hasAllSigilsAndPower = !!(
+    has("sigilMoon") &&
+    has("sigilSun") &&
+    has("sigilVine") &&
+    flags.powerRestored
+  );
+  flags.loreComplete = !!(
+    flags.page1Read &&
+    flags.page2Read && 
+    flags.portraitSeen && 
+    flags.cellarNoteRad &&
+    flags.loreTrunk &&
+    flags.recordsRead
+  )
 }
 
 export const useGameStore = create<Store>()(

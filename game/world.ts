@@ -1,16 +1,40 @@
 import { ItemId, RoomDef } from "./types";
 
 export const ITEM_NAMES: Record<ItemId, string> = {
-    letterOpener: "Brass Letter Opener",
-    rustyKey: "Rusted Iron Key",
-    journalPage1: "Torn Journal Page (I)",
-}
+  letterOpener: "Brass Letter Opener",
+  rustyKey: "Rusted Iron Key",
+  journalPage1: "Torn Journal Page (I)",
+  journalPage2: "Torn Journal Page (II)",
+  matches: "Box of Matches",
+  kitchenKnife: "Kitchen Knife",
+  copperFuse: "Copper Fuse",
+  atticKey: "Small Brass Key",
+  sigilMoon: "Ward Sigil — Moon",
+  sigilSun: "Ward Sigil — Sun",
+  sigilVine: "Ward Sigil — Vine",
+};
 
 export const ITEM_DESCRIPTIONS: Record<ItemId, string> = {
-    letterOpener: "Tarnished brass, sharp enough to pry a stuck drawer open.",
-    rustyKey: "Cold, heavy, orange with rust.",
-    journalPage1: "\"...she counts the rooms at night. Nine, always nine...\"",
-}
+  letterOpener: "Tarnished brass, sharp enough to pry a stuck drawer open.",
+  rustyKey:
+    "Cold, heavy, orange with rust. It smells like old blood, or maybe just iron.",
+  journalPage1:
+    "\"...she counts the rooms at night. Nine, always nine, but I have only ever found eight. The ninth she calls the Quiet Room, and she says it moves.\"",
+  journalPage2:
+    "\"...if it learns your footsteps it will start to walk in time with them, so you stop hearing it under your own. Wear soft shoes. Read the pages together, before the shelf.\"",
+  matches: "A half-empty box. Enough light to see by, for a while.",
+  kitchenKnife: "Plain, sharp, and heavier than it looks in your hand.",
+  copperFuse:
+    "A fat copper fuse, still good. The fuse box in the cellar is missing exactly one.",
+  atticKey:
+    "Small and brass, worn smooth like it's been turned a thousand times.",
+  sigilMoon:
+    "A disc of tarnished silver etched with a crescent. It is faintly warm to the touch.",
+  sigilSun:
+    "A disc of dull gold etched with rays. It hums almost below hearing.",
+  sigilVine:
+    "A disc of green-black bronze etched with creeping vines. It smells of wet earth.",
+};
 
 export const ROOMS: Record<string, RoomDef> = {
   foyer: {
@@ -78,3 +102,5 @@ export const ROOMS: Record<string, RoomDef> = {
 };
 
 export const START_ROOM: RoomDef["id"] = "foyer";
+
+export const ROOM_LIST = Object.values(ROOMS)

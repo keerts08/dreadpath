@@ -1,6 +1,27 @@
-export type RoomId = "foyer" | "study";
+export type RoomId =
+  | "foyer"
+  | "study"
+  | "library"
+  | "diningHall"
+  | "kitchen"
+  | "hallway"
+  | "bathroom"
+  | "bedroom"
+  | "cellar"
+  | "attic";
 
-export type ItemId = "letterOpener" | "rustyKey" | "journalPage1";
+export type ItemId =
+  | "letterOpener"
+  | "rustyKey"
+  | "journalPage1"
+  | "journalPage2"
+  | "matches"
+  | "kitchenKnife"
+  | "copperFuse"
+  | "atticKey"
+  | "sigilMoon"
+  | "sigilSun"
+  | "sigilVine";
 
 export type NoiseLevel = "none" | "low" | "medium" | "high";
 
