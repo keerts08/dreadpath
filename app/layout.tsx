@@ -15,7 +15,7 @@ const body = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Ravenshade Manor",
+  title: "Dreadpath",
   description:
     "You woke up somewhere you shouldn't be. Something else lives here.",
 };

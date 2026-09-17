@@ -1,28 +1,55 @@
+"use client"
 import HomeLayout from "@/components/home-layout";
+import Layer from "@/components/layer";
 import {
   Dialog,
   DialogClose,
   DialogContent,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { useGameStore } from "@/game/store";
+import { hasSaveGame, useHydrated } from "@/game/useHydrated";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  const router = useRouter();
+  const hydrated = useHydrated();
+  const newGame = useGameStore((s) => s.newGame);
+
+  const canContinue = hydrated && hasSaveGame();
+
+  const begin = (fresh: boolean) => {
+    if (fresh) newGame();
+    router.push("/play")
+  }
   return (
     <HomeLayout>
       <div className="min-h-screen flex items-center justify-center px-4">
+        <Layer showRec={false} />
         <div className="relative z-10 max-w-sm w-full text-center space-y-8 py-16 bg-void/50 rounded-xl px-4">
           <div className="space-y-2">
             <h1 className="font-display text-4xl sm:text-5xl text-bone">
-              RAVENSHADE <br /> MANOR
+              DREADPATH
             </h1>
             <p className="text-xs tracking-widest text-ink-faint caret">
               SOMETHING ELSE LIVES HERE
             </p>
 
             <div className="space-y-3">
-              <button className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors">
+              <button
+                onClick={() => begin(true)}
+                className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors"
+              >
                 PLAY
               </button>
+              {canContinue && (
+                <button
+                  onClick={() => begin(false)}
+                  className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors"
+                >
+                  CONTINUE
+                </button>
+              )}
               <Dialog>
                 <DialogTrigger
                   render={
@@ -36,9 +63,9 @@ export default function Home() {
                     HOW TO PLAY
                   </h2>
                   <p>
-                    You wake up inside Ravenshade Manor with no memory of how you
-                    got there. Explore the house, gather what you find, and get
-                    out.
+                    You wake up inside Ravenshade Manor with no memory of how
+                    you got there. Explore the house, gather what you find, and
+                    get out.
                   </p>
                   <p>
                     You are not alone. Every action — moving, searching, forcing
