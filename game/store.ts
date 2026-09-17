@@ -1,3 +1,5 @@
+"use client";
+
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import {
@@ -10,8 +12,8 @@ import {
   LogEntry,
   LogTone,
 } from "./types";
-import { ROOMS, START_ROOM } from "./world";
-import { tensionBand, tickEntity } from "./entity";
+import { ITEM_NAMES, ROOMS, START_ROOM } from "./world";
+import { tickEntity, tensionBand } from "./entity";
 import {
   AMBIENT_CLOSE,
   AMBIENT_NOTICED,
@@ -140,8 +142,82 @@ export const useGameStore = create<Store>()(
         maybeHallucinate(set, get);
       },
 
-      interact: () => {
-        // need to write interact logic
+      interact: (hotspot) => {
+        const s = get();
+        if (s.ending || s.isHidden) return;
+        if (
+          hotspot.requiresItem &&
+          !s.inventory.includes(hotspot.requiresItem)
+        ) {
+          appendLog(
+            set,
+            s.turn,
+            hotspot.lockedText ?? "You need something else for that.",
+            "dread",
+          );
+          return;
+        }
+        if (hotspot.requiresFlag && !s.flags[hotspot.requiresFlag]) {
+          appendLog(set, s.turn, hotspot.lockedText ?? "Not yet.", "dread");
+          return;
+        }
+        const alreadyResolved = s.resolvedHotspots.includes(hotspot.id);
+        const text = alreadyResolved
+          ? (hotspot.afterText ?? pickText(hotspot.examineText, 1))
+          : (hotspot.resolveText ?? pickText(hotspot.examineText, 0));
+        appendLog(set, s.turn, text, "narration");
+
+        const newFlags = { ...s.flags };
+        let newInventory = [...s.inventory];
+        let newResolved = s.resolvedHotspots;
+        if (!alreadyResolved) {
+          if (hotspot.givesItem) {
+            newInventory.push(hotspot.givesItem);
+            appendLog(
+              set,
+              s.turn,
+              `Obtained: ${ITEM_NAMES[hotspot.givesItem]}.`,
+              "item",
+            );
+          }
+          if (hotspot.consumesItem && hotspot.requiresItem) {
+            newInventory = newInventory.filter(
+              (i) => i !== hotspot.requiresItem,
+            );
+          }
+          if (hotspot.setsFlag) newFlags[hotspot.setsFlag] = true;
+          newResolved = [...s.resolvedHotspots, hotspot.id];
+        }
+        recomputeDerivedFlags(newFlags, newInventory);
+
+        let sanity = s.sanity;
+        let examinedOnce = s.examinedOnce;
+        if (
+          !s.examinedOnce.includes(hotspot.id) &&
+          hotspot.sanityOnFirstExamine
+        ) {
+          sanity = clampSanity(sanity + hotspot.sanityOnFirstExamine);
+          examinedOnce = [...s.examinedOnce, hotspot.id];
+        }
+
+        const turn = s.turn + 1;
+        set({
+          flags: newFlags,
+          inventory: newInventory,
+          resolvedHotspots: newResolved,
+          sanity,
+          examinedOnce,
+          turn,
+        });
+
+        if (hotspot.endsGameAs) {
+          finishGame(set, get, hotspot.endsGameAs);
+          return;
+        }
+        const room = ROOMS[s.currentRoom];
+        runEntityTick(set, get, hotspot.noise, room.dangerLevel);
+        checkEndings(set, get);
+        maybeHallucinate(set, get);
       },
 
       hide: () => {
@@ -161,7 +237,7 @@ export const useGameStore = create<Store>()(
 
       stopHiding: () => {
         const s = get();
-        if (s.ending || s.isHidden) return;
+        if (s.ending || !s.isHidden) return;
         set({ isHidden: false, hideStreak: 0 });
         appendLog(
           set,

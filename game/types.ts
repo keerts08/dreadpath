@@ -26,9 +26,9 @@ export interface HotspotDef {
   name: string;
   examineText: string | string[];
   givesItem?: ItemId;
-  requiredItem?: ItemId;
+  requiresItem?: ItemId;
   consumesItem?: boolean;
-  requiredFlag?: string;
+  requiresFlag?: string;
   lockedText?: string;
   setsFlag?: string;
   resolveText?: string;
