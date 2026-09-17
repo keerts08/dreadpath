@@ -52,6 +52,27 @@ export const ROOMS: Record<string, RoomDef> = {
         afterText: "The blotter, empty now but for an old inkwell.",
         noise: "low"
       },
+      {
+        id: "drawer",
+        name: "Pry Open the Stuck Drawer",
+        examineText: "The bottom drawer is swollen shut. It won't budge by hand.",
+        requiredItem: "letterOpener",
+        setsFlag: "drawerOpen",
+        resolveText: "You work the letter opener into the seam and the drawer gives.",
+        afterText: "The drawer sits open and empty.",
+        lockedText: "It's stuck fast. You'd need something to pry it with.",
+        noise: "medium"
+      },
+      {
+        id: "drawerKey",
+        name: "Take the Rusted Key",
+        examineText: "A heavy iron key, sitting in the open drawer.",
+        requiredFlag: "drawerOpen",
+        lockedText: "The drawer is still stuck shut.",
+        givesItem: "rustyKey",
+        resolveText: "You pocket the key.",
+        noise: "low",
+      }
     ],
   },
 };
