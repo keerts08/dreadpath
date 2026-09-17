@@ -34,62 +34,61 @@ export default function Home() {
             <p className="text-xs tracking-widest text-ink-faint caret">
               SOMETHING ELSE LIVES HERE
             </p>
-
-            <div className="space-y-3">
+          </div>
+          <div className="space-y-3">
+            <button
+              onClick={() => begin(true)}
+              className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors"
+            >
+              PLAY
+            </button>
+            {canContinue && (
               <button
-                onClick={() => begin(true)}
+                onClick={() => begin(false)}
                 className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors"
               >
-                PLAY
+                CONTINUE
               </button>
-              {canContinue && (
-                <button
-                  onClick={() => begin(false)}
-                  className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors"
-                >
-                  CONTINUE
-                </button>
-              )}
-              <Dialog>
-                <DialogTrigger
+            )}
+            <Dialog>
+              <DialogTrigger
+                render={
+                  <button className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-ink-dim hover:text-ink transition-colors">
+                    HOW TO PLAY
+                  </button>
+                }
+              />
+              <DialogContent className="max-w-md border bg-panel p-5 space-y-3 text-sm text-ink-dim leading-relaxed text-left border-line">
+                <h2 className="font-display text-base text-bone tracking-widest">
+                  HOW TO PLAY
+                </h2>
+                <p>
+                  You wake up inside Ravenshade Manor with no memory of how you
+                  got there. Explore the house, gather what you find, and get
+                  out.
+                </p>
+                <p>
+                  You are not alone. Every action — moving, searching, forcing
+                  something open — makes noise, and noise draws it closer.
+                  Careful, quiet play is safer than rushing.
+                </p>
+                <p>
+                  If it gets close, look for somewhere to hide. Staying hidden
+                  too long isn&rsquo;t free either — it will start to check.
+                </p>
+                <p>
+                  There may be more than one way for your night in this house to
+                  end.
+                </p>
+                <DialogClose
                   render={
-                    <button className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-ink-dim hover:text-ink transition-colors">
-                      HOW TO PLAY
+                    <button className="mt-2 border border-line px-4 py-2 text-xs tracking-widest hover:border-amber hover:text-amber">
+                      CLOSE
                     </button>
                   }
                 />
-                <DialogContent className="max-w-md border bg-panel p-5 space-y-3 text-sm text-ink-dim leading-relaxed text-left border-line">
-                  <h2 className="font-display text-base text-bone tracking-widest">
-                    HOW TO PLAY
-                  </h2>
-                  <p>
-                    You wake up inside Ravenshade Manor with no memory of how
-                    you got there. Explore the house, gather what you find, and
-                    get out.
-                  </p>
-                  <p>
-                    You are not alone. Every action — moving, searching, forcing
-                    something open — makes noise, and noise draws it closer.
-                    Careful, quiet play is safer than rushing.
-                  </p>
-                  <p>
-                    If it gets close, look for somewhere to hide. Staying hidden
-                    too long isn&rsquo;t free either — it will start to check.
-                  </p>
-                  <p>
-                    There may be more than one way for your night in this house
-                    to end.
-                  </p>
-                  <DialogClose
-                    render={
-                      <button className="mt-2 border border-line px-4 py-2 text-xs tracking-widest hover:border-amber hover:text-amber">
-                        CLOSE
-                      </button>
-                    }
-                  />
-                </DialogContent>
-              </Dialog>
-            </div>
+              </DialogContent>
+            </Dialog>
 
             <p className="text-[11px] text-ink-faint leading-relaxed">
               made by keerthii
