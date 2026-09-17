@@ -1,11 +1,32 @@
-import { create } from "zustand"
+import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Ending, EntityState, ExitDef, GameState, HotspotDef, ItemId, LogEntry, LogTone } from "./types";
+import {
+  Ending,
+  EntityState,
+  ExitDef,
+  GameState,
+  HotspotDef,
+  ItemId,
+  LogEntry,
+  LogTone,
+} from "./types";
 import { ROOMS, START_ROOM } from "./world";
 import { tensionBand, tickEntity } from "./entity";
-import { AMBIENT_CLOSE, AMBIENT_NOTICED, AMBIENT_VERY_CLOSE, CLOSE_CALL_LINES, HALLUCINATION_ROOM_LINES, pick, SANITY_LOW_SYSTEM_LINES } from "./narrative";
+import {
+  AMBIENT_CLOSE,
+  AMBIENT_NOTICED,
+  AMBIENT_VERY_CLOSE,
+  CLOSE_CALL_LINES,
+  HALLUCINATION_ROOM_LINES,
+  pick,
+  SANITY_LOW_SYSTEM_LINES,
+} from "./narrative";
 
-const INITIAL_ENTITY: EntityState = { distance: 100, alertness: 8, lastEvent: null };
+const INITIAL_ENTITY: EntityState = {
+  distance: 100,
+  alertness: 8,
+  lastEvent: null,
+};
 
 function freshState(started = false): GameState {
   return {
@@ -22,7 +43,13 @@ function freshState(started = false): GameState {
     entity: { ...INITIAL_ENTITY },
     isHidden: false,
     hideStreak: 0,
-    log: [makeEntry(0, ROOMS[START_ROOM].firstVisitText ?? ROOMS[START_ROOM].description, "narration")],
+    log: [
+      makeEntry(
+        0,
+        ROOMS[START_ROOM].firstVisitText ?? ROOMS[START_ROOM].description,
+        "narration",
+      ),
+    ],
     audioEnabled: true,
   };
 }
@@ -51,8 +78,12 @@ interface GameActions {
 type Store = GameState & GameActions;
 type SetFn = (partial: Partial<Store> | ((s: Store) => Partial<Store>)) => void;
 
-function recomputeDerivedFlags(flags: Record<string, boolean>, inventory: ItemId[]) {
-    void flags; void inventory;
+function recomputeDerivedFlags(
+  flags: Record<string, boolean>,
+  inventory: ItemId[],
+) {
+  void flags;
+  void inventory;
 }
 
 export const useGameStore = create<Store>()(
@@ -118,91 +149,128 @@ export const useGameStore = create<Store>()(
         if (s.ending || s.isHidden) return;
         const turn = s.turn + 1;
         set({ isHidden: true, hideStreak: 0, turn });
-        appendLog(set, turn, "You tuck yourself out of sight and go still.", "system");
+        appendLog(
+          set,
+          turn,
+          "You tuck yourself out of sight and go still.",
+          "system",
+        );
         runEntityTick(set, get, "none", ROOMS[s.currentRoom].dangerLevel);
-        checkEndings(set, get)
+        checkEndings(set, get);
       },
 
       stopHiding: () => {
         const s = get();
         if (s.ending || s.isHidden) return;
         set({ isHidden: false, hideStreak: 0 });
-        appendLog(set, s.turn, "You ease back out, joints stiff from holding still.", "system")
+        appendLog(
+          set,
+          s.turn,
+          "You ease back out, joints stiff from holding still.",
+          "system",
+        );
       },
 
       wait: () => {
         const s = get();
         if (s.ending) return;
         const turn = s.turn + 1;
-        const hideStreak = s.isHidden ? s.hideStreak + 1: 0;
+        const hideStreak = s.isHidden ? s.hideStreak + 1 : 0;
         set({ turn, hideStreak });
-        if (!s.isHidden) appendLog(set, turn, "You wait, and listen, and try to slow your breathing.", "system");
-        runEntityTick(set, get, 'none', ROOMS[s.currentRoom].dangerLevel);
+        if (!s.isHidden)
+          appendLog(
+            set,
+            turn,
+            "You wait, and listen, and try to slow your breathing.",
+            "system",
+          );
+        runEntityTick(set, get, "none", ROOMS[s.currentRoom].dangerLevel);
         checkEndings(set, get);
-        if (!s.isHidden) maybeHallucinate(set, get)
-      }
+        if (!s.isHidden) maybeHallucinate(set, get);
+      },
     }),
-    { name : "ravenshade-manor-save"}
+    { name: "ravenshade-manor-save" },
   ),
 );
 
 function clampSanity(n: number) {
-    return Math.max(0, Math.min(100, n));
+  return Math.max(0, Math.min(100, n));
 }
 
 function appendLog(set: SetFn, turn: number, text: string, tone: LogTone) {
-    set((s) => ({ log: [...s.log, makeEntry(turn, text, tone)].slice(-200)}))
+  set((s) => ({ log: [...s.log, makeEntry(turn, text, tone)].slice(-200) }));
 }
 
-function runEntityTick(set: SetFn, get: () => Store, noise: Parameters<typeof tickEntity>[0]["noise"], dangerLevel: 0 | 1 | 2 | 3) {
-    const s = get();
-    const prevBand = tensionBand(s.entity.distance);
-    const result = tickEntity({ entity: s.entity, noise, dangerLevel, isHidden: s.isHidden, hideStreak: s.hideStreak});
-    if (result.foundWhileHidden) {
-        set({ entity: { ...result.entity, distance: 0 }});
-        appendLog(set, s.turn, "It finds you anyway. There is no more hiding from this.", "dread");
-        finishGame(set, get, "caught");
-        return
-    }
-    set({ entity: result.entity });
+function runEntityTick(
+  set: SetFn,
+  get: () => Store,
+  noise: Parameters<typeof tickEntity>[0]["noise"],
+  dangerLevel: 0 | 1 | 2 | 3,
+) {
+  const s = get();
+  const prevBand = tensionBand(s.entity.distance);
+  const result = tickEntity({
+    entity: s.entity,
+    noise,
+    dangerLevel,
+    isHidden: s.isHidden,
+    hideStreak: s.hideStreak,
+  });
 
-    if (result.closeCall) {
-        appendLog(set, s.turn, pick(CLOSE_CALL_LINES), "whisper");
-        set((st) => ({ sanity: clampSanity(st.sanity -2 )}))
-    } else {
-        const newBand = tensionBand(result.entity.distance);
-        if (newBand !== prevBand) {;
-            if (newBand === "noticed") appendLog(set, s.turn, pick(AMBIENT_NOTICED), "whisper")
-                else if (newBand === "close") {
-            appendLog(set, s.turn, pick(AMBIENT_CLOSE), "whisper");
-            set((st) => ({ sanity: clampSanity(st.sanity - 1) }));
-                } else if (newBand === "veryClose" || newBand === "chase") {
-                    appendLog(set, s.turn, pick(AMBIENT_VERY_CLOSE), "dread");
-                    set((st) => ({ sanity: clampSanity(st.sanity - 2)}))
-                }
-        }
-    }
+  if (result.foundWhileHidden) {
+    set({ entity: { ...result.entity, distance: 0 } });
+    appendLog(
+      set,
+      s.turn,
+      "It finds you anyway. There is no more hiding from this.",
+      "dread",
+    );
+    finishGame(set, get, "caught");
+    return;
+  }
+  set({ entity: result.entity });
 
-    if (result.captured) {
-        appendLog(set, s.turn, "It has you now.", "dread");
-        finishGame(set, get, "caught")
+  if (result.closeCall) {
+    appendLog(set, s.turn, pick(CLOSE_CALL_LINES), "whisper");
+    set((st) => ({ sanity: clampSanity(st.sanity - 2) }));
+  } else {
+    const newBand = tensionBand(result.entity.distance);
+    if (newBand !== prevBand) {
+      if (newBand === "noticed")
+        appendLog(set, s.turn, pick(AMBIENT_NOTICED), "whisper");
+      else if (newBand === "close") {
+        appendLog(set, s.turn, pick(AMBIENT_CLOSE), "whisper");
+        set((st) => ({ sanity: clampSanity(st.sanity - 1) }));
+      } else if (newBand === "veryClose" || newBand === "chase") {
+        appendLog(set, s.turn, pick(AMBIENT_VERY_CLOSE), "dread");
+        set((st) => ({ sanity: clampSanity(st.sanity - 2) }));
+      }
     }
+  }
+
+  if (result.captured) {
+    appendLog(set, s.turn, "It has you now.", "dread");
+    finishGame(set, get, "caught");
+  }
 }
 
 function maybeHallucinate(set: SetFn, get: () => Store) {
-    const s = get();
-    if (s.ending || s.sanity >= 40 || Math.random() > 0.3) return;
-    const roomLines = HALLUCINATION_ROOM_LINES[s.currentRoom];
-    const line = roomLines && Math.random() < 0.5 ? pick(roomLines) : pick(SANITY_LOW_SYSTEM_LINES);
-    appendLog(set, s.turn, line, "hallucination")
+  const s = get();
+  if (s.ending || s.sanity >= 40 || Math.random() > 0.3) return;
+  const roomLines = HALLUCINATION_ROOM_LINES[s.currentRoom];
+  const line =
+    roomLines && Math.random() < 0.5
+      ? pick(roomLines)
+      : pick(SANITY_LOW_SYSTEM_LINES);
+  appendLog(set, s.turn, line, "hallucination");
 }
 
 function checkEndings(set: SetFn, get: () => Store) {
-    if (get(). ending) return;
-    if (get(). sanity <= 0) finishGame(set, get, "madness")
+  if (get().ending) return;
+  if (get().sanity <= 0) finishGame(set, get, "madness");
 }
 
 function finishGame(set: SetFn, get: () => Store, ending: Ending) {
-    if (get().ending) return;
-    set({ending});
+  if (get().ending) return;
+  set({ ending });
 }
