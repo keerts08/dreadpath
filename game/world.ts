@@ -65,7 +65,9 @@ export const ROOMS: Record<string, RoomDef> = {
     dangerLevel: 1,
     description:
       "Bookshelves line the walls. A writing desk sits under a shuttered window.",
-    exits: [{ to: "foyer", label: "Return to the Foyer", noise: "low" }],
+    exits: [{ to: "foyer", label: "Return to the Foyer", noise: "low" },
+      {to: "library", label: "Go to the Library", noise: "low"}
+    ],
     hotspots: [
       {
         id: "desk",
@@ -74,18 +76,20 @@ export const ROOMS: Record<string, RoomDef> = {
         givesItem: "letterOpener",
         resolveText: "You take the letter opener. It's colder than the room.",
         afterText: "The blotter, empty now but for an old inkwell.",
-        noise: "low"
+        noise: "low",
       },
       {
         id: "drawer",
         name: "Pry Open the Stuck Drawer",
-        examineText: "The bottom drawer is swollen shut. It won't budge by hand.",
+        examineText:
+          "The bottom drawer is swollen shut. It won't budge by hand.",
         requiresItem: "letterOpener",
         setsFlag: "drawerOpen",
-        resolveText: "You work the letter opener into the seam and the drawer gives.",
+        resolveText:
+          "You work the letter opener into the seam and the drawer gives.",
         afterText: "The drawer sits open and empty.",
         lockedText: "It's stuck fast. You'd need something to pry it with.",
-        noise: "medium"
+        noise: "medium",
       },
       {
         id: "drawerKey",
@@ -96,9 +100,35 @@ export const ROOMS: Record<string, RoomDef> = {
         givesItem: "rustyKey",
         resolveText: "You pocket the key.",
         noise: "low",
-      }
+      },
     ],
   },
+
+  library: {
+    id: "library",
+    name: "The Library",
+    palette: "amber",
+    dangerLevel: 1,
+    description:
+      "Floor-to-ceiling shelves, most books swollen with damp. One shelf sits slightly proud of the wall, as though it isn't finished with the rest of them.",
+    exits: [{ to: "study", label: "Return to the Study", noise: "low"},
+      {to: "diningHall", label: "Go to the Dining Hall", noise: "low"}
+    ],
+    hotspots: [
+      {
+        id: "loreBooks",
+        name: "Read the Old Records",
+        examineText: "Estate legers, mostly rot. One entry srvives: a household of nine rooms, and a live-in ward who 'does not eat with the family, and is not to be spoken of outside these walls.'",
+        setsFlag: "recordsRead",
+        sanityOnFirstExamine: -2,
+        noise: "none",
+      },
+    ]
+  },
+
+ 
+
+  
 };
 
 export const START_ROOM: RoomDef["id"] = "foyer";
