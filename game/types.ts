@@ -133,7 +133,7 @@ export interface RoomLayout {
   playerStart: Vec2;
   walls: RectZone[];
   doors: DoorZone[];
-  hotspotZone: HotspotZone[];
+  hotspotZones: HotspotZone[];
   entitySpawn: Vec2;
 }
 
