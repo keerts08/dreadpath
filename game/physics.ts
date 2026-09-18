@@ -1,7 +1,6 @@
-import { BadgePoundSterling } from "lucide-react";
 import { RectZone, Vec2 } from "./types";
 
-function clamp(n: number, min: number, max: number) {
+export function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
@@ -12,6 +11,18 @@ export function rectContains(zone: RectZone, p: Vec2, pad = 0) {
     p.y >= zone.y - pad &&
     p.y <= zone.y + zone.h + pad
   );
+}
+
+export function dist(a: Vec2, b: Vec2) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+export function lerp(a: number, b: number, t: number) {
+  return a + (b-a) * t;
+}
+
+export function lerpVec(a: Vec2, b: Vec2, t: number): Vec2 {
+  return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t) };
 }
 
 export function moveWithCollision(
