@@ -16,6 +16,7 @@ const CAPTURE_RADIUS = PLAYER_RADIUS + ENTITY_RADIUS - 6;
 const INTERACT_PAD = 18;
 const ENTITY_ACTIVATION_DISTANCE = 45;
 const RUN_NOISE_INTERVAL_MS = 850;
+const SPAWN_GRACE_FRAMES = 24;
 
 const PALETTE_FILL: Record<RoomDef["palette"], { bg: string; wall: string }> = {
   amber: { bg: "#150f09", wall: "#2a1f10" },
@@ -75,6 +76,7 @@ export default function RoomCanvas({
   const wasHidden = useRef(isHidden);
   const renderedEntityPos = useRef<Vec2>({ ...layout.entitySpawn });
   const renderedEntityOpacity = useRef(0);
+  const spawnFrameCount = useRef(0)
 
   const lastFrameAt = useRef<number | null>(null);
   const rafId = useRef<number | null>(null);
@@ -199,6 +201,8 @@ export default function RoomCanvas({
         }
       }
 
+      spawnFrameCount.current +=1
+      if (spawnFrameCount.current > SPAWN_GRACE_FRAMES) {
       const stillInside = new Set<string>();
       for (const door of layout.doors) {
         const exitDef = room.exits.find(
@@ -212,7 +216,7 @@ export default function RoomCanvas({
           }
         }
       }
-      insideDoors.current = stillInside;
+      insideDoors.current = stillInside;}
 
       let nearest: HotspotDef | null = null;
       let nearestDist = Infinity;

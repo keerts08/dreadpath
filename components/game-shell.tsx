@@ -13,12 +13,13 @@ import MapPanel from "./map-panel";
 import StatusHUD from "./status-hud";
 import RoomCanvas from "./room-canvas";
 import Inventory from "./inventory";
-import { ExitDef, HotspotDef } from "@/game/types";
+import { ExitDef, HotspotDef, Vec2 } from "@/game/types";
 
 export default function GameShell() {
   const hydrated = useHydrated();
   const router = useRouter();
   const [scareShown, setScareShown] = useState(false);
+  const [doorSpawn, setDoorSpawn] = useState<Vec2 | null>(null)
 
   const started = useGameStore((s) => s.started);
   const ending = useGameStore((s) => s.ending);
@@ -51,7 +52,11 @@ export default function GameShell() {
 
   const keysDown = useRef<Set<string>>(new Set());
 
-  const handleUseExit = useCallback((exit: ExitDef) => move(exit), [move]);
+  const handleUseExit = useCallback((exit: ExitDef) => {
+    const door = LAYOUTS[currentRoom].doors.find((d) => d.exitLabel === exit.label);
+    if (door) setDoorSpawn(door.spawn)  
+    move(exit)
+  }, [currentRoom, move]);
   const handleInteract = useCallback(
     (h: HotspotDef) => interact(h),
     [interact],
@@ -77,6 +82,7 @@ export default function GameShell() {
 
   const room = ROOMS[currentRoom];
   const layout = LAYOUTS[currentRoom];
+  const spawnPoint = doorSpawn ?? layout.playerStart
   const band = tensionBand(entity.distance);
   const lowSanity = sanity < 40;
 
