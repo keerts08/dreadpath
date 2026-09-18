@@ -104,3 +104,36 @@ export interface GameState {
   log: LogEntry[];
   audioEnabled: boolean;
 }
+
+export interface Vec2 {
+  x: number;
+  y: number;
+}
+
+export interface RectZone {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export interface DoorZone {
+  exitLabel: string;
+  zone: RectZone;
+}
+
+export interface HotspotZone {
+  hotspotId: string;
+  zone: RectZone;
+}
+
+export interface RoomLayout {
+  width: number;
+  height: number;
+  playerStart: Vec2;
+  walls: RectZone[];
+  doors: DoorZone[];
+  hotspotZone: HotspotZone[];
+  entitySpawn: Vec2;
+}
+
