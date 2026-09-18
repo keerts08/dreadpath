@@ -1,3 +1,5 @@
+"use client"
+
 import { TensionBand } from "@/game/entity";
 import { RoomDef } from "@/game/types";
 
@@ -41,7 +43,7 @@ export default function RoomStage({
 
   return (
     <div
-      className="relative overflow-hidden rounded-sm border border-line h-40 sm:h-42 flex items-end"
+      className="relative overflow-hidden rounded-sm border border-line h-40 sm:h-52 flex items-end"
       style={{ background: palette.bg }}
     >
       <div
@@ -58,7 +60,7 @@ export default function RoomStage({
         <p className="font-display text-lg sm:text-xl text-bone">
           {room.name}
           {isHidden && (
-            <span className="text-ink-dim text-sm font-body">- hidden</span>
+            <span className="text-ink-dim text-sm font-body"> - hidden</span>
           )}
         </p>
       </div>

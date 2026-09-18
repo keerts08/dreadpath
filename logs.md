@@ -7,3 +7,4 @@ stuff i ref and used ai for:
 - narrative.ts ai made better lines
 - body in ending screen ai gen
 - svg for jumpscare ai gen
+- used ai to make half to the house

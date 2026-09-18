@@ -20,8 +20,8 @@ import {
   AMBIENT_VERY_CLOSE,
   CLOSE_CALL_LINES,
   HALLUCINATION_ROOM_LINES,
-  pick,
   SANITY_LOW_SYSTEM_LINES,
+  pick,
 } from "./narrative";
 
 const INITIAL_ENTITY: EntityState = {
@@ -94,12 +94,12 @@ function recomputeDerivedFlags(
   );
   flags.loreComplete = !!(
     flags.page1Read &&
-    flags.page2Read && 
-    flags.portraitSeen && 
-    flags.cellarNoteRad &&
+    flags.page2Read &&
+    flags.portraitSeen &&
+    flags.cellarNoteRead &&
     flags.loreTrunk &&
     flags.recordsRead
-  )
+  );
 }
 
 export const useGameStore = create<Store>()(

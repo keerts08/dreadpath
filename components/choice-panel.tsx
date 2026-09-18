@@ -54,6 +54,7 @@ export default function ChoicePanel({
       </div>
     );
   }
+
   const visibleHotspots = room.hotspots.filter((h) => hotspotVisible(h, flags));
   const visibleExits = room.exits.filter((e) => exitVisible(e, flags));
 
