@@ -9,3 +9,4 @@ stuff i ref and used ai for:
 - svg for jumpscare ai gen
 - used ai to make half to the house
 - used ai to make the test page (deleted)
+- player ai gen
