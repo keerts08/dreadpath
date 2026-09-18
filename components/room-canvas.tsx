@@ -7,6 +7,7 @@ import {
   rectContains,
 } from "@/game/physics";
 import { RefObject, useEffect, useRef } from "react";
+import { drawHotspotIcon } from "./furniture-art";
 
 const WALK_SPEED = 190;
 const RUN_SPEED = 340;
@@ -20,11 +21,14 @@ const SPAWN_GRACE_FRAMES = 24;
 const LIGHT_INNER_RADIUS = 65;
 const LIGHT_OUTER_RADIUS = 190;
 
-const PALETTE_FILL: Record<RoomDef["palette"], { bg: string; wall: string }> = {
-  amber: { bg: "#150f09", wall: "#2a1f10" },
-  cold: { bg: "#0d1114", wall: "#131a1f" },
-  rot: { bg: "#0e120d", wall: "#171c14" },
-  void: { bg: "#0a0809", wall: "#120e10" },
+const PALETTE_FILL: Record<
+  RoomDef["palette"],
+  { bg: string; wall: string; accent: string }
+> = {
+  amber: { bg: "#150f09", wall: "#2a1f10", accent: "#b98a4a" },
+  cold: { bg: "#0d1114", wall: "#131a1f", accent: "#7896aa" },
+  rot: { bg: "#0e120d", wall: "#171c14", accent: "#4b5a45" },
+  void: { bg: "#0a0809", wall: "#120e10", accent: "#6e1414" },
 };
 
 function hotspotVisible(h: HotspotDef, flags: Record<string, boolean>) {
@@ -44,6 +48,7 @@ interface Props {
   flags: Record<string, boolean>;
   resolvedHotspots: string[];
   isHidden: boolean;
+  paused: boolean;
   entityDistance: number;
   keysDown: RefObject<Set<string>>;
   onInteractHotspot: (hotspot: HotspotDef) => void;
@@ -60,6 +65,7 @@ export default function RoomCanvas({
   flags,
   resolvedHotspots,
   isHidden,
+  paused,
   entityDistance,
   keysDown,
   onInteractHotspot,
@@ -78,8 +84,9 @@ export default function RoomCanvas({
   const wasHidden = useRef(isHidden);
   const renderedEntityPos = useRef<Vec2>({ ...layout.entitySpawn });
   const renderedEntityOpacity = useRef(0);
-  const spawnFrameCount = useRef(0)
-  const lightJitter = useRef(0)
+  const spawnFrameCount = useRef(0);
+  const lightJitter = useRef(0);
+  const lastRunNoiseAt = useRef(0);
 
   const lastFrameAt = useRef<number | null>(null);
   const rafId = useRef<number | null>(null);
@@ -90,6 +97,7 @@ export default function RoomCanvas({
     flags,
     resolvedHotspots,
     isHidden,
+    paused,
     entityDistance,
     onInteractHotspot,
     onToggleHide,
@@ -104,6 +112,7 @@ export default function RoomCanvas({
       flags,
       resolvedHotspots,
       isHidden,
+      paused,
       entityDistance,
       onInteractHotspot,
       onToggleHide,
@@ -179,7 +188,7 @@ export default function RoomCanvas({
       } = latest.current;
       const keys = keysDown.current;
 
-      if (!isHidden) {
+      if (!paused && !isHidden) {
         let dx = 0;
         let dy = 0;
         if (keys.has("arrowup") || keys.has("w")) dy -= 1;
@@ -201,74 +210,86 @@ export default function RoomCanvas({
             { width: layout.width, height: layout.height },
             layout.walls,
           );
-        }
-      }
 
-      spawnFrameCount.current +=1
-      if (spawnFrameCount.current > SPAWN_GRACE_FRAMES) {
-      const stillInside = new Set<string>();
-      for (const door of layout.doors) {
-        const exitDef = room.exits.find(
-          (e: ExitDef) => e.label === door.exitLabel,
-        );
-        if (!exitDef || !exitVisible(exitDef, flags)) continue;
-        if (rectContains(door.zone, playerPos.current, PLAYER_RADIUS * 0.4)) {
-          stillInside.add(door.exitLabel);
-          if (!insideDoors.current.has(door.exitLabel)) {
-            latest.current.onUseExit(exitDef);
+          if (running && t - lastRunNoiseAt.current > RUN_NOISE_INTERVAL_MS) {
+            lastRunNoiseAt.current = t;
+            latest.current.onRunNoise();
           }
         }
       }
-      insideDoors.current = stillInside;}
 
-      let nearest: HotspotDef | null = null;
-      let nearestDist = Infinity;
-      for (const hz of layout.hotspotZones) {
-        const hotspotDef = room.hotspots.find(
-          (h: HotspotDef) => h.id === hz.hotspotId,
-        );
-        if (!hotspotDef || !hotspotVisible(hotspotDef, flags)) continue;
-        if (rectContains(hz.zone, playerPos.current, INTERACT_PAD)) {
-          const cx = hz.zone.x + hz.zone.w / 2;
-          const cy = hz.zone.y + hz.zone.h / 2;
-          const d = Math.hypot(
-            cx - playerPos.current.x,
-            cy - playerPos.current.y,
+      let nearest: HotspotDef | null = nearbyHotspot.current;
+
+      if (!paused) {
+        spawnFrameCount.current += 1;
+        if (spawnFrameCount.current > SPAWN_GRACE_FRAMES) {
+          const stillInside = new Set<string>();
+          for (const door of layout.doors) {
+            const exitDef = room.exits.find(
+              (e: ExitDef) => e.label === door.exitLabel,
+            );
+            if (!exitDef || !exitVisible(exitDef, flags)) continue;
+            if (
+              rectContains(door.zone, playerPos.current, PLAYER_RADIUS * 0.4)
+            ) {
+              stillInside.add(door.exitLabel);
+              if (!insideDoors.current.has(door.exitLabel)) {
+                latest.current.onUseExit(exitDef);
+              }
+            }
+          }
+          insideDoors.current = stillInside;
+        }
+
+        nearest = null;
+        let nearestDist = Infinity;
+        for (const hz of layout.hotspotZones) {
+          const hotspotDef = room.hotspots.find(
+            (h: HotspotDef) => h.id === hz.hotspotId,
           );
-          if (d < nearestDist) {
-            nearestDist = d;
-            nearest = hotspotDef;
+          if (!hotspotDef || !hotspotVisible(hotspotDef, flags)) continue;
+          if (rectContains(hz.zone, playerPos.current, INTERACT_PAD)) {
+            const cx = hz.zone.x + hz.zone.w / 2;
+            const cy = hz.zone.y + hz.zone.h / 2;
+            const d = Math.hypot(
+              cx - playerPos.current.x,
+              cy - playerPos.current.y,
+            );
+            if (d < nearestDist) {
+              nearestDist = d;
+              nearest = hotspotDef;
+            }
           }
         }
-      }
-      nearbyHotspot.current = nearest;
+        nearbyHotspot.current = nearest;
 
-      const active = entityDistance <= ENTITY_ACTIVATION_DISTANCE;
-      const chaseProgress = clamp(
-        (ENTITY_ACTIVATION_DISTANCE - entityDistance) /
-          ENTITY_ACTIVATION_DISTANCE,
-        0,
-        1,
-      );
-      const target = isHidden ? lastSeenPos.current : playerPos.current;
-      const idealPos = lerpVec(layout.entitySpawn, target, chaseProgress);
-      renderedEntityPos.current = lerpVec(
-        renderedEntityPos.current,
-        idealPos,
-        0.05,
-      );
-      lightJitter.current = Math.sin(t / 340) * 6 +Math.sin(t/ 97) * 3;
-      renderedEntityOpacity.current +=
-        ((active ? 1 : 0) - renderedEntityOpacity.current) * 0.06;
+        const active = entityDistance <= ENTITY_ACTIVATION_DISTANCE;
+        const chaseProgress = clamp(
+          (ENTITY_ACTIVATION_DISTANCE - entityDistance) /
+            ENTITY_ACTIVATION_DISTANCE,
+          0,
+          1,
+        );
+        const target = isHidden ? lastSeenPos.current : playerPos.current;
+        const idealPos = lerpVec(layout.entitySpawn, target, chaseProgress);
+        renderedEntityPos.current = lerpVec(
+          renderedEntityPos.current,
+          idealPos,
+          0.05,
+        );
+        renderedEntityOpacity.current +=
+          ((active ? 1 : 0) - renderedEntityOpacity.current) * 0.06;
+        lightJitter.current = Math.sin(t / 340) * 6 + Math.sin(t / 97) * 3;
 
-      if (
-        !isHidden &&
-        !hasBeenCaught.current &&
-        renderedEntityOpacity.current > 0.55 &&
-        dist(playerPos.current, renderedEntityPos.current) < CAPTURE_RADIUS
-      ) {
-        hasBeenCaught.current = true;
-        latest.current.onCaught();
+        if (
+          !isHidden &&
+          !hasBeenCaught.current &&
+          renderedEntityOpacity.current > 0.55 &&
+          dist(playerPos.current, renderedEntityPos.current) < CAPTURE_RADIUS
+        ) {
+          hasBeenCaught.current = true;
+          latest.current.onCaught();
+        }
       }
 
       draw(
@@ -329,12 +350,19 @@ function draw(
   const { width, height } = layout;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = palette.bg;
-  ctx.fillRect(0, 0, width, height);
 
-  ctx.strokeStyle = "#262a2b";
-  ctx.lineWidth = 40;
-  ctx.strokeRect(0, 0, width, height);
+  const grad = ctx.createRadialGradient(
+    width / 2,
+    height * 0.25,
+    40,
+    width / 2,
+    height * 0.5,
+    width * 0.75,
+  );
+  grad.addColorStop(0, palette.wall);
+  grad.addColorStop(1, palette.bg);
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
 
   ctx.font = "13px var(--font-body, monospace)";
   for (const door of layout.doors) {
@@ -357,27 +385,22 @@ function draw(
     const resolved = resolvedHotspots.includes(h.id);
     const isNear = nearestHotspot?.id === h.id;
     ctx.fillStyle = h.isHideSpot
-      ? "rgba(75,90,69,0.28)"
+      ? "rgba(75,90,69,0.16)"
       : resolved
-        ? "rgba(120,116,108,0.14)"
-        : "rgba(185,138,74,0.22)";
-    ctx.strokeStyle = isNear ? "#b98a4a" : "rgba(120,116,108,0.35)";
+        ? "rgba(120,116,108,0.08)"
+        : "rgba(185,138,74,0.1)";
+    ctx.strokeStyle = isNear ? "#b98a4a" : "rgba(120,116,108,0.3)";
     ctx.lineWidth = isNear ? 2 : 1;
-    ctx.fillRect(hz.zone.x, hz.zone.y, hz.zone.w, hz.zone.h);
-    ctx.strokeRect(hz.zone.x, hz.zone.y, hz.zone.w, hz.zone.h);
-    ctx.fillStyle = "rgba(201,197,189,0.6)";
-    ctx.textAlign = "center";
-    ctx.fillText(
-      h.name.replace(
-        /^(Take|Examine|Open|Pry Open|Read|Search|Fix|Hide|Cut|Look).*?the /i,
-        "",
-      ),
-      hz.zone.x + hz.zone.w / 2,
-      hz.zone.y + hz.zone.h / 2 + 4,
-    );
+    roundRect(ctx, hz.zone.x, hz.zone.y, hz.zone.w, hz.zone.h, 6);
+    ctx.fill();
+    ctx.stroke();
+    drawHotspotIcon(ctx, h.id, hz.zone, palette.accent, resolved, flags);
   }
 
-  if (entityOpacity > 0.01) drawEntity(ctx, entityPos, entityOpacity);
+  if (entityOpacity > 0.01) {
+    drawEntityBody(ctx, entityPos, entityOpacity);
+  }
+
   drawPlayer(ctx, player, facingDir, isHidden);
 
   if (nearestHotspot) {
@@ -387,11 +410,10 @@ function draw(
     ctx.font = "bold 14px var(--font-body, monospace)";
     ctx.textAlign = "center";
     ctx.fillStyle = "#e8e3d8";
-    ctx.fillText(
-      `[E] ${nearestHotspot.name}`,
-      hz.zone.x + hz.zone.w / 2,
-      hz.zone.y - 10,
-    );
+    const label = nearestHotspot.isHideSpot
+      ? `[E] ${nearestHotspot.name}`
+      : `[E] ${nearestHotspot.name}`;
+    ctx.fillText(label, hz.zone.x + hz.zone.w / 2, hz.zone.y - 10);
   }
 
   const inner = Math.max(20, LIGHT_INNER_RADIUS + lightJitter);
@@ -409,6 +431,10 @@ function draw(
   dark.addColorStop(1, "rgba(3,2,4,0.97)");
   ctx.fillStyle = dark;
   ctx.fillRect(0, 0, width, height);
+
+  if (entityOpacity > 0.01) {
+    drawEntityEyes(ctx, entityPos, entityOpacity);
+  }
 }
 
 function shortDoorLabel(label: string) {
@@ -419,6 +445,23 @@ function shortDoorLabel(label: string) {
     .replace(/^Open the /i, "");
 }
 
+function roundRect(
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number,
+) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
+}
+
 function drawPlayer(
   ctx: CanvasRenderingContext2D,
   pos: Vec2,
@@ -427,6 +470,7 @@ function drawPlayer(
 ) {
   ctx.save();
   ctx.globalAlpha = isHidden ? 0.28 : 1;
+
   ctx.fillStyle = "rgba(0,0,0,0.4)";
   ctx.beginPath();
   ctx.ellipse(pos.x, pos.y + 15, 13, 5.5, 0, 0, Math.PI * 2);
@@ -462,6 +506,19 @@ function drawPlayer(
   ctx.closePath();
   ctx.fill();
 
+  ctx.fillStyle = "rgba(255,255,255,0.12)";
+  ctx.beginPath();
+  ctx.ellipse(
+    pos.x + facingDir.x * 6,
+    pos.y + facingDir.y * 6 - 2,
+    5,
+    9,
+    Math.atan2(facingDir.y, facingDir.x),
+    0,
+    Math.PI * 2,
+  );
+  ctx.fill();
+
   ctx.fillStyle = "#33302a";
   ctx.beginPath();
   ctx.arc(
@@ -472,10 +529,16 @@ function drawPlayer(
     Math.PI * 2,
   );
   ctx.fill();
+
   ctx.restore();
 }
 
-function drawEntity(ctx: CanvasRenderingContext2D, pos: Vec2, opacity: number) {
+function drawEntityBody(
+  ctx: CanvasRenderingContext2D,
+  pos: Vec2,
+  opacity: number,
+) {
+  if (opacity <= 0.02) return;
   ctx.save();
   ctx.globalAlpha = opacity;
 
@@ -526,6 +589,18 @@ function drawEntity(ctx: CanvasRenderingContext2D, pos: Vec2, opacity: number) {
   ctx.closePath();
   ctx.fill();
 
+  ctx.restore();
+}
+
+function drawEntityEyes(
+  ctx: CanvasRenderingContext2D,
+  pos: Vec2,
+  opacity: number,
+) {
+  if (opacity <= 0.02) return;
+  ctx.save();
+  ctx.globalAlpha = opacity;
+
   const eyeY = pos.y - 18;
   for (const ex of [-5, 5]) {
     const eyeGlow = ctx.createRadialGradient(
@@ -548,5 +623,6 @@ function drawEntity(ctx: CanvasRenderingContext2D, pos: Vec2, opacity: number) {
   ctx.arc(pos.x - 5, eyeY, 1.6, 0, Math.PI * 2);
   ctx.arc(pos.x + 5, eyeY, 1.6, 0, Math.PI * 2);
   ctx.fill();
+
   ctx.restore();
 }

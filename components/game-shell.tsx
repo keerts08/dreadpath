@@ -14,12 +14,16 @@ import StatusHUD from "./status-hud";
 import RoomCanvas from "./room-canvas";
 import Inventory from "./inventory";
 import { ExitDef, HotspotDef, Vec2 } from "@/game/types";
+import ActionLog from "./action-log";
+
+const AMBIENT_TICK_MS = 4200;
 
 export default function GameShell() {
   const hydrated = useHydrated();
   const router = useRouter();
   const [scareShown, setScareShown] = useState(false);
   const [doorSpawn, setDoorSpawn] = useState<Vec2 | null>(null)
+  const [paused, setPaused] = useState(false)
 
   const started = useGameStore((s) => s.started);
   const ending = useGameStore((s) => s.ending);
@@ -52,19 +56,36 @@ export default function GameShell() {
 
   const keysDown = useRef<Set<string>>(new Set());
 
+  useEffect(() => {
+    if (!started || ending || paused) return;
+    const id = setInterval(ambientTick, AMBIENT_TICK_MS);
+    return () => clearInterval(id); 
+    }, [started, ending, paused, ambientTick])
+
+    useEffect(() => {
+      const onKey = (e: KeyboardEvent) => {
+        if (e.key === "Escape") setPaused((p) => !p);
+      }
+      window.addEventListener("keydown", onKey)
+      return () => window.removeEventListener("keydown", onKey)
+    }, [])
+
   const handleUseExit = useCallback((exit: ExitDef) => {
     const door = LAYOUTS[currentRoom].doors.find((d) => d.exitLabel === exit.label);
     if (door) setDoorSpawn(door.spawn)  
     move(exit)
   }, [currentRoom, move]);
+
   const handleInteract = useCallback(
     (h: HotspotDef) => interact(h),
     [interact],
   );
+
   const handleToggleHide = useCallback(() => {
     if (isHiddenRef.current) stopHiding();
     else hide();
   }, [hide, stopHiding]);
+
   const handleRunNoise = useCallback(() => pulseNosie("low"), [pulseNosie]);
   const handleCaught = useCallback(() => capture(), [capture]);
 
@@ -104,6 +125,10 @@ export default function GameShell() {
         />
       )}
 
+      {paused && !ending && (
+        <div className="fixed inset-0 z-[92] bg-black/90">paused</div>
+      )}
+
       <CorruptionWrapper band={band} lowSanity={lowSanity}>
         <div className="mx-auto max-w-6xl px-4 py-6">
           <MapPanel currentRoom={currentRoom} visitedRooms={visitedRooms} />
@@ -121,6 +146,7 @@ export default function GameShell() {
             flags={flags}
             resolvedHotspots={resolvedHotspots}
             isHidden={isHidden}
+            paused={paused}
             entityDistance={entity.distance}
             keysDown={keysDown}
             onInteractHotspot={handleInteract}
@@ -130,7 +156,7 @@ export default function GameShell() {
             onCaught={handleCaught}
           />
           <p>{room.description}</p>
-
+<ActionLog entries={log} />
           <Inventory items={inventory} />
         </div>
       </CorruptionWrapper>
