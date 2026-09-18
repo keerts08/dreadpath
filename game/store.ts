@@ -11,6 +11,7 @@ import {
   ItemId,
   LogEntry,
   LogTone,
+  NoiseLevel,
 } from "./types";
 import { ITEM_NAMES, ROOMS, START_ROOM } from "./world";
 import { tickEntity, tensionBand } from "./entity";
@@ -73,7 +74,9 @@ interface GameActions {
   interact: (hotspot: HotspotDef) => void;
   hide: () => void;
   stopHiding: () => void;
-  wait: () => void;
+  ambientTick: () => void;
+  pulseNosie: (noise: NoiseLevel) => void;
+  capture: () => void;
   toggleAudio: () => void;
 }
 
@@ -261,22 +264,29 @@ export const useGameStore = create<Store>()(
         );
       },
 
-      wait: () => {
+      ambientTick: () => {
         const s = get();
         if (s.ending) return;
         const turn = s.turn + 1;
         const hideStreak = s.isHidden ? s.hideStreak + 1 : 0;
         set({ turn, hideStreak });
-        if (!s.isHidden)
-          appendLog(
-            set,
-            turn,
-            "You wait, and listen, and try to slow your breathing.",
-            "system",
-          );
         runEntityTick(set, get, "none", ROOMS[s.currentRoom].dangerLevel);
-        checkEndings(set, get);
-        if (!s.isHidden) maybeHallucinate(set, get);
+        checkEndings(set, get)
+        if (!s.isHidden) maybeHallucinate(set, get)
+      },
+
+      pulseNosie: (noise) => {
+        const s = get();
+        if (s.ending || s.isHidden) return;
+         runEntityTick(set, get, noise, ROOMS[s.currentRoom].dangerLevel);
+         checkEndings(set, get);
+      },
+
+      capture: () => {
+        const s = get();
+        if (s.ending || s.isHidden) return;
+        appendLog(set, s.turn, "It has you now.", "dread")
+        finishGame(set, get, "caught")
       },
     }),
     { name: "ravenshade-manor-save" },

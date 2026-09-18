@@ -23,7 +23,7 @@ export function useHydrated(): boolean {
 export function hasSaveGame(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    const raw = window.localStorage.getItem("blackwell-manor-save");
+    const raw = window.localStorage.getItem("ravenshade-manor-save");
     if (!raw) return false;
     const parsed = JSON.parse(raw);
     return !!parsed?.state?.started;

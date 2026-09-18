@@ -10,7 +10,7 @@ const CONTENT: Record<
     body: [
       "The door gives, and cold outside air hits you like a slap. You don't look back — you've learned better than that.",
       "By morning you will have convinced yourself most of it was shock, and rain, and an unfamiliar house playing tricks. Most of it.",
-      "Blackwell Manor stands exactly as it always has, its door bolted three times over, waiting for the next set of headlights in the rain.",
+      "Ravenshade Manor stands exactly as it always has, its door bolted three times over, waiting for the next set of headlights in the rain.",
     ],
   },
   banished: {
