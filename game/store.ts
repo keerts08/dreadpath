@@ -54,6 +54,8 @@ function freshState(started = false): GameState {
       ),
     ],
     audioEnabled: true,
+    volume: 0.75,
+    reduceMotion: false,
   };
 }
 
@@ -78,6 +80,8 @@ interface GameActions {
   pulseNosie: (noise: NoiseLevel) => void;
   capture: () => void;
   toggleAudio: () => void;
+  setVolume: (volume: number) => void;
+  toggleReduceMotion: () => void;
 }
 
 type Store = GameState & GameActions;
@@ -112,6 +116,8 @@ export const useGameStore = create<Store>()(
 
       newGame: () => set(freshState(true)),
       toggleAudio: () => set((s) => ({ audioEnabled: !s.audioEnabled })),
+      setVolume: (volume) => set({ volume: Math.max(0, Math.min(1, volume)) }),
+      toggleReduceMotion: () => set((s) => ({ reduceMotion: !s.reduceMotion})),
 
       move: (exit) => {
         const s = get();

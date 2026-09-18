@@ -12,12 +12,15 @@ const BAND_CLASS: Record<TensionBand, string> = {
 export default function CorruptionWrapper({
     band,
     lowSanity,
+    reduceMotion,
     children,
 }: {
     band: TensionBand;
     lowSanity: boolean;
+    reduceMotion: boolean;
     children: ReactNode;
 }) {
-    const cls = [BAND_CLASS[band], lowSanity ? "tension-2" : ""].filter(Boolean).join(" ");
+    const bandClass = reduceMotion && BAND_CLASS[band] === "tension-4" ? "tension-3" : BAND_CLASS[band]
+    const cls = [bandClass, lowSanity ? "tension-2" : ""].filter(Boolean).join(" ");
     return <div className={`corruption-root ${cls}`}>{children}</div> 
 }

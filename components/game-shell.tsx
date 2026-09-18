@@ -38,6 +38,8 @@ export default function GameShell() {
   const isHidden = useGameStore((s) => s.isHidden);
   const log = useGameStore((s) => s.log);
   const audioEnabled = useGameStore((s) => s.audioEnabled);
+  const volume = useGameStore((s) => s.volume);
+  const reduceMotion = useGameStore((s) => s.reduceMotion)
 
   const move = useGameStore((s) => s.move);
   const interact = useGameStore((s) => s.interact);
@@ -47,6 +49,8 @@ export default function GameShell() {
   const pulseNosie = useGameStore((s) => s.pulseNosie);
   const capture = useGameStore((s) => s.capture);
   const toggleAudio = useGameStore((s) => s.toggleAudio);
+  const toggleVolume = useGameStore((s) => s.setVolume)
+  const toggleReduceMotion = useGameStore((s) => s.toggleReduceMotion)
   const newGame = useGameStore((s) => s.newGame);
 
   const isHiddenRef = useRef(isHidden);
@@ -129,7 +133,7 @@ export default function GameShell() {
         <div className="fixed inset-0 z-[92] bg-black/90">paused</div>
       )}
 
-      <CorruptionWrapper band={band} lowSanity={lowSanity}>
+      <CorruptionWrapper band={band} lowSanity={lowSanity} reduceMotion={reduceMotion}>
         <div className="mx-auto max-w-6xl px-4 py-6">
           <MapPanel currentRoom={currentRoom} visitedRooms={visitedRooms} />
           <StatusHUD

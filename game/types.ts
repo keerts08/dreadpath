@@ -103,6 +103,8 @@ export interface GameState {
   hideStreak: number;
   log: LogEntry[];
   audioEnabled: boolean;
+  volume: number;
+  reduceMotion: boolean;
 }
 
 export interface Vec2 {
