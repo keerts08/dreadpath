@@ -117,7 +117,7 @@ export default function GameShell() {
           <RoomCanvas
             room={room}
             layout={layout}
-            spawn={layout.playerStart}
+            spawn={spawnPoint}
             flags={flags}
             resolvedHotspots={resolvedHotspots}
             isHidden={isHidden}
