@@ -59,6 +59,7 @@ export interface HotspotDef {
   sanityOnFirstExamine?: number;
   endsGameAs?: Ending;
 }
+
 export interface ExitDef {
   to: RoomId;
   label: string;
