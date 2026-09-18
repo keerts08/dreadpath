@@ -1,7 +1,18 @@
-import { RoomId, RoomLayout } from "./types";
+import { RoomId, RoomLayout, Vec2 } from "./types";
 
 const W = 900;
 const H = 520;
+
+const WEST_LANDING: Vec2 = { x: 170, y: 270 };
+const EAST_LANDING: Vec2 = { x: 730, y: 270 };
+const NORTH_LANDING: Vec2 = { x: 450, y: 170 };
+const SOUTH_LANDING: Vec2 = { x: 450, y: 350 };
+
+const ATTIC_SOUTH_LANDING: Vec2 = { x: 450, y: 365 };
+const CELLAR_NORTH_LANDING: Vec2 = { x: 450, y: 220 };
+const LIBRARY_NORTH_LANDING: Vec2 = { x: 490, y: 200 };
+
+const FRONT_DOOR_SPAWN: Vec2 = { x: 450, y: 300 };
 
 export const LAYOUTS: Record<RoomId, RoomLayout> = {
   foyer: {
@@ -10,18 +21,25 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
     playerStart: { x: 450, y: 300 },
     walls: [],
     doors: [
-      { exitLabel: "Go to the Study", zone: { x: 40, y: 220, w: 20, h: 100 } },
+      {
+        exitLabel: "Go to the Study",
+        zone: { x: 40, y: 220, w: 20, h: 100 },
+        spawn: EAST_LANDING,
+      },
       {
         exitLabel: "Go to the Dining Hall",
         zone: { x: 840, y: 220, w: 20, h: 100 },
+        spawn: WEST_LANDING,
       },
       {
         exitLabel: "Go down the Hallway",
         zone: { x: 400, y: 40, w: 100, h: 20 },
+        spawn: SOUTH_LANDING,
       },
       {
         exitLabel: "Open the Front Door",
         zone: { x: 400, y: 460, w: 100, h: 20 },
+        spawn: FRONT_DOOR_SPAWN,
       },
     ],
     hotspotZones: [
@@ -40,11 +58,13 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
     doors: [
       {
         exitLabel: "Return to the Foyer",
-        zone: { x: 40, y: 220, w: 20, h: 100 },
+        zone: { x: 840, y: 220, w: 20, h: 100 },
+        spawn: WEST_LANDING,
       },
       {
         exitLabel: "Go to the Library",
-        zone: { x: 840, y: 220, w: 20, h: 100 },
+        zone: { x: 400, y: 460, w: 100, h: 20 },
+        spawn: LIBRARY_NORTH_LANDING,
       },
     ],
     hotspotZones: [
@@ -67,7 +87,8 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
     doors: [
       {
         exitLabel: "Return to the Study",
-        zone: { x: 840, y: 220, w: 20, h: 100 },
+        zone: { x: 400, y: 40, w: 100, h: 20 },
+        spawn: SOUTH_LANDING,
       },
     ],
     hotspotZones: [
@@ -86,14 +107,17 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
       {
         exitLabel: "Return to the Foyer",
         zone: { x: 40, y: 220, w: 20, h: 100 },
+        spawn: EAST_LANDING,
       },
       {
         exitLabel: "Go to the Kitchen",
         zone: { x: 840, y: 220, w: 20, h: 100 },
+        spawn: WEST_LANDING,
       },
       {
         exitLabel: "Unlock the Cellar Door",
         zone: { x: 400, y: 460, w: 100, h: 20 },
+        spawn: CELLAR_NORTH_LANDING,
       },
     ],
     hotspotZones: [
@@ -114,6 +138,7 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
       {
         exitLabel: "Return to the Dining Hall",
         zone: { x: 40, y: 220, w: 20, h: 100 },
+        spawn: EAST_LANDING,
       },
     ],
     hotspotZones: [
@@ -132,18 +157,22 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
       {
         exitLabel: "Return to the Foyer",
         zone: { x: 400, y: 460, w: 100, h: 20 },
+        spawn: NORTH_LANDING,
       },
       {
         exitLabel: "Go to the Bedroom",
         zone: { x: 840, y: 220, w: 20, h: 100 },
+        spawn: WEST_LANDING,
       },
       {
         exitLabel: "Go to the Bathroom",
         zone: { x: 40, y: 220, w: 20, h: 100 },
+        spawn: EAST_LANDING,
       },
       {
         exitLabel: "Unlock the Attic Stairs",
         zone: { x: 400, y: 40, w: 100, h: 20 },
+        spawn: ATTIC_SOUTH_LANDING,
       },
     ],
     hotspotZones: [
@@ -160,6 +189,7 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
       {
         exitLabel: "Return to the Hallway",
         zone: { x: 840, y: 220, w: 20, h: 100 },
+        spawn: WEST_LANDING,
       },
     ],
     hotspotZones: [
@@ -180,6 +210,7 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
       {
         exitLabel: "Return to the Hallway",
         zone: { x: 40, y: 220, w: 20, h: 100 },
+        spawn: EAST_LANDING,
       },
     ],
     hotspotZones: [
@@ -202,6 +233,7 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
       {
         exitLabel: "Go back up to the Dining Hall",
         zone: { x: 400, y: 40, w: 100, h: 20 },
+        spawn: SOUTH_LANDING,
       },
     ],
     hotspotZones: [
@@ -224,6 +256,7 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
       {
         exitLabel: "Go back down to the Hallway",
         zone: { x: 400, y: 460, w: 100, h: 20 },
+        spawn: NORTH_LANDING,
       },
     ],
     hotspotZones: [

@@ -12,7 +12,7 @@ const WALK_SPEED = 190;
 const RUN_SPEED = 340;
 const PLAYER_RADIUS = 15;
 const ENTITY_RADIUS = 22;
-const CAPTURE_RADIUS = 31;
+const CAPTURE_RADIUS = PLAYER_RADIUS + ENTITY_RADIUS - 6;
 const INTERACT_PAD = 18;
 const ENTITY_ACTIVATION_DISTANCE = 45;
 const RUN_NOISE_INTERVAL_MS = 850;
@@ -70,7 +70,7 @@ export default function RoomCanvas({
   const facing = useRef<Vec2>({ x: 0, y: 1 });
   const insideDoors = useRef<Set<string>>(new Set());
   const hasBeenCaught = useRef(false);
-  const nearbyHotpot = useRef<HotspotDef | null>(null);
+  const nearbyHotspot = useRef<HotspotDef | null>(null);
   const lastSeenPos = useRef<Vec2>({ ...spawn });
   const wasHidden = useRef(isHidden);
   const renderedEntityPos = useRef<Vec2>({ ...layout.entitySpawn });
@@ -136,7 +136,7 @@ export default function RoomCanvas({
       }
       if (k === "e") {
         e.preventDefault();
-        const h = nearbyHotpot.current;
+        const h = nearbyHotspot.current;
         if (h) {
           if (h.isHideSpot) latest.current.onToggleHide(h);
           else latest.current.onInteractHotspot(h);
@@ -201,14 +201,14 @@ export default function RoomCanvas({
 
       const stillInside = new Set<string>();
       for (const door of layout.doors) {
-        const extiDef = room.exits.find(
+        const exitDef = room.exits.find(
           (e: ExitDef) => e.label === door.exitLabel,
         );
-        if (!extiDef || !exitVisible(extiDef, flags)) continue;
+        if (!exitDef || !exitVisible(exitDef, flags)) continue;
         if (rectContains(door.zone, playerPos.current, PLAYER_RADIUS * 0.4)) {
           stillInside.add(door.exitLabel);
           if (!insideDoors.current.has(door.exitLabel)) {
-            latest.current.onUseExit(extiDef);
+            latest.current.onUseExit(exitDef);
           }
         }
       }
@@ -234,7 +234,7 @@ export default function RoomCanvas({
           }
         }
       }
-      nearbyHotpot.current = nearest;
+      nearbyHotspot.current = nearest;
 
       const active = entityDistance <= ENTITY_ACTIVATION_DISTANCE;
       const chaseProgress = clamp(
@@ -288,7 +288,7 @@ export default function RoomCanvas({
 
   return (
     <div
-      className="relative w-full border border-line overflow-hiden bg-black"
+      className="relative w-full border border-line overflow-hidden bg-black"
       style={{ aspectRatio: `${layout.width} / ${layout.height}` }}
     >
       <canvas

@@ -11,7 +11,7 @@ import CorruptionWrapper from "./corruption-wrapper";
 import { tensionBand } from "@/game/entity";
 import MapPanel from "./map-panel";
 import StatusHUD from "./status-hud";
-import RoomCanvas from "./game2d";
+import RoomCanvas from "./room-canvas";
 import Inventory from "./inventory";
 import { ExitDef, HotspotDef } from "@/game/types";
 

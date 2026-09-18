@@ -120,6 +120,7 @@ export interface RectZone {
 export interface DoorZone {
   exitLabel: string;
   zone: RectZone;
+  spawn: Vec2,
 }
 
 export interface HotspotZone {
