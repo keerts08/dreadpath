@@ -14,9 +14,11 @@ const PLAYER_RADIUS = 15;
 const ENTITY_RADIUS = 22;
 const CAPTURE_RADIUS = PLAYER_RADIUS + ENTITY_RADIUS - 6;
 const INTERACT_PAD = 18;
-const ENTITY_ACTIVATION_DISTANCE = 45;
+const ENTITY_ACTIVATION_DISTANCE = 32;
 const RUN_NOISE_INTERVAL_MS = 850;
 const SPAWN_GRACE_FRAMES = 24;
+const LIGHT_INNER_RADIUS = 65;
+const LIGHT_OUTER_RADIUS = 190;
 
 const PALETTE_FILL: Record<RoomDef["palette"], { bg: string; wall: string }> = {
   amber: { bg: "#150f09", wall: "#2a1f10" },
@@ -77,6 +79,7 @@ export default function RoomCanvas({
   const renderedEntityPos = useRef<Vec2>({ ...layout.entitySpawn });
   const renderedEntityOpacity = useRef(0);
   const spawnFrameCount = useRef(0)
+  const lightJitter = useRef(0)
 
   const lastFrameAt = useRef<number | null>(null);
   const rafId = useRef<number | null>(null);
@@ -254,6 +257,7 @@ export default function RoomCanvas({
         idealPos,
         0.05,
       );
+      lightJitter.current = Math.sin(t / 340) * 6 +Math.sin(t/ 97) * 3;
       renderedEntityOpacity.current +=
         ((active ? 1 : 0) - renderedEntityOpacity.current) * 0.06;
 
@@ -280,6 +284,7 @@ export default function RoomCanvas({
         renderedEntityOpacity.current,
         resolvedHotspots,
         flags,
+        lightJitter.current,
       );
       rafId.current = requestAnimationFrame(frame);
     };
@@ -318,6 +323,7 @@ function draw(
   entityOpacity: number,
   resolvedHotspots: string[],
   flags: Record<string, boolean>,
+  lightJitter: number,
 ) {
   const palette = PALETTE_FILL[room.palette];
   const { width, height } = layout;
@@ -387,6 +393,22 @@ function draw(
       hz.zone.y - 10,
     );
   }
+
+  const inner = Math.max(20, LIGHT_INNER_RADIUS + lightJitter);
+  const outer = LIGHT_OUTER_RADIUS + lightJitter;
+  const dark = ctx.createRadialGradient(
+    player.x,
+    player.y,
+    inner,
+    player.x,
+    player.y,
+    outer,
+  );
+  dark.addColorStop(0, "rgba(3,2,4,0)");
+  dark.addColorStop(0.6, "rgba(3,2,4,0.55)");
+  dark.addColorStop(1, "rgba(3,2,4,0.97)");
+  ctx.fillStyle = dark;
+  ctx.fillRect(0, 0, width, height);
 }
 
 function shortDoorLabel(label: string) {

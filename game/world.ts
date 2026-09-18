@@ -144,7 +144,6 @@ export const ROOMS: Record<string, RoomDef> = {
         examineText:
           "A heavy iron key, orange with rust, sitting in the open drawer.",
         requiresFlag: "drawerOpen",
-        lockedText: "The drawer is still stuck shut.",
         givesItem: "rustyKey",
         resolveText: "You pocket the key.",
         noise: "low",
@@ -155,7 +154,6 @@ export const ROOMS: Record<string, RoomDef> = {
         examineText:
           "A page torn from a journal, hidden under the drawer's lining.",
         requiresFlag: "drawerOpen",
-        lockedText: "The drawer is still stuck shut.",
         givesItem: "journalPage1",
         setsFlag: "page1Read",
         resolveText: "You read it once, twice, and wish you hadn't.",

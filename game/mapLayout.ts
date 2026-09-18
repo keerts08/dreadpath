@@ -1,17 +1,17 @@
 import { RoomId } from "./types";
 import { ROOMS } from "./world";
 
-export const ROOM_MAP_POS: Record<RoomId, { x: number; y: number }> = {
-  foyer: { x: 160, y: 140 },
-  study: { x: 40, y: 140 },
-  library: { x: 40, y: 40 },
-  diningHall: { x: 280, y: 140 },
-  kitchen: { x: 280, y: 40 },
-  cellar: { x: 280, y: 240 },
-  hallway: { x: 160, y: 40 },
-  bathroom: { x: 60, y: 240 },
-  bedroom: { x: 260, y: 240 },
-  attic: { x: 160, y: 240 },
+export const MAP_GRID: Record<RoomId, { col: number; row: number }> = {
+  foyer: { col: 0, row: 0 },
+  study: { col: -1, row: 0 },
+  library: { col: -1, row: 1 },
+  diningHall: { col: 1, row: 0 },
+  kitchen: { col: 2, row: 0 },
+  cellar: { col: 1, row: 1 },
+  hallway: { col: 0, row: -1 },
+  bathroom: { col: -1, row: -1 },
+  bedroom: { col: 1, row: -1 },
+  attic: { col: 0, row: -2 },
 };
 
 export interface MapEdge {
