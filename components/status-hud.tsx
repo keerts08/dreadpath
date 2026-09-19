@@ -46,7 +46,7 @@ export default function StatusHUD({
           : "bg-blood-bright";
 
   return (
-    <div className="flex items-center justify-between border border-line bg-panel/60 px-3 py-2 text-[11px] tracking widest text-ink-dim">
+    <div className="flex items-center justify-between border border-line bg-panel/60 px-3 py-2 text-[11px] tracking-widest text-ink-dim">
       <div className="flex items-center gap-2">
         <span
           className={`inline-block h-1.5 w-1.5 rounded-full ${presenceColor} ${band === "chase" ? "rec-dot" : ""}`}

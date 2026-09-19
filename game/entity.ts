@@ -50,10 +50,10 @@ export function tickEntity(input: EntityTickInput): EntityTickResult {
       closeCall = true;
     }
   } else {
-    const base = 2 + Math.random() * 3.5;
-    const alertPull = alertness / 9;
-    const dangerPull = dangerLevel * 1.6;
-    const wander = Math.random() < 0.18 ? -(Math.random() * 4) : 0;
+    const base = 2 + Math.random() * 1.0;
+    const alertPull = alertness / 28;
+    const dangerPull = dangerLevel * 0.4;
+    const wander = Math.random() < 0.2 ? -(Math.random() * 4) : 0;
     distance = clamp(distance - base - alertPull - dangerPull - wander, 0, 100);
   }
 

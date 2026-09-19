@@ -77,7 +77,7 @@ interface GameActions {
   hide: () => void;
   stopHiding: () => void;
   ambientTick: () => void;
-  pulseNosie: (noise: NoiseLevel) => void;
+  pulseNoise: (noise: NoiseLevel) => void;
   capture: () => void;
   toggleAudio: () => void;
   setVolume: (volume: number) => void;
@@ -281,7 +281,7 @@ export const useGameStore = create<Store>()(
         if (!s.isHidden) maybeHallucinate(set, get);
       },
 
-      pulseNosie: (noise) => {
+      pulseNoise: (noise) => {
         const s = get();
         if (s.ending || s.isHidden) return;
         runEntityTick(set, get, noise, ROOMS[s.currentRoom].dangerLevel);

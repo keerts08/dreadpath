@@ -103,7 +103,7 @@ export default function MapPanel({
 
   return (
     <div className="border border-line bg-panel/60 p-3">
-      <div className="flex item-center justify-between mb-2">
+      <div className="flex items-center justify-between mb-2">
         <p className="text-[11px] tracking-widest text-ink-faint">MAP</p>
         <div className="flex gap-1">
           <button
@@ -130,7 +130,7 @@ export default function MapPanel({
       <svg
         ref={svgRef}
         viewBox={viewBox}
-        className="w-full h-36 overflow-hidden cursor-grab active-cursor-grabbing touch-none"
+        className="w-full h-36 overflow-hidden cursor-grab active:cursor-grabbing touch-none"
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}
