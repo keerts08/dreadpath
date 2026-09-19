@@ -50,7 +50,7 @@ export function tickEntity(input: EntityTickInput): EntityTickResult {
       closeCall = true;
     }
   } else {
-    const base = 2 + Math.random() * 1.0;
+    const base = 0.4 + Math.random() * 1.0;
     const alertPull = alertness / 28;
     const dangerPull = dangerLevel * 0.4;
     const wander = Math.random() < 0.2 ? -(Math.random() * 4) : 0;

@@ -46,7 +46,7 @@ export default function GameShell() {
   const hide = useGameStore((s) => s.hide);
   const stopHiding = useGameStore((s) => s.stopHiding);
   const ambientTick = useGameStore((s) => s.ambientTick);
-  const pulseNosie = useGameStore((s) => s.pulseNosie);
+  const pulseNoise = useGameStore((s) => s.pulseNoise);
   const capture = useGameStore((s) => s.capture);
   const toggleAudio = useGameStore((s) => s.toggleAudio);
   const toggleVolume = useGameStore((s) => s.setVolume);
@@ -95,7 +95,7 @@ export default function GameShell() {
     else hide();
   }, [hide, stopHiding]);
 
-  const handleRunNoise = useCallback(() => pulseNosie("low"), [pulseNosie]);
+  const handleRunNoise = useCallback(() => pulseNoise("low"), [pulseNoise]);
   const handleCaught = useCallback(() => capture(), [capture]);
 
   if (!hydrated) {
