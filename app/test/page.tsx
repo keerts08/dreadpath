@@ -6,12 +6,7 @@ export default function MapPreview() {
   return (
     <MapPanel
       currentRoom="foyer"
-      visitedRooms={[
-        "foyer" ,
-          "study" ,
-          "library" ,
-          "diningHall",
-      ]}
+      visitedRooms={["foyer", "study", "library", "diningHall"]}
     />
   );
 }

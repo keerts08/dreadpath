@@ -23,11 +23,7 @@ function formatTimecode(totalSeconds: number) {
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
-export default function Layer({
-  showRec = true,
-}: {
-  showRec?: boolean;
-}) {
+export default function Layer({ showRec = true }: { showRec?: boolean }) {
   const seconds = useElapsed();
   return (
     <>

@@ -47,7 +47,13 @@ body {
 }
 
 body {
-  font-family: var(--font-body, ui-monospace, "SFMono-Regular", Menlo, monospace);
+  font-family: var(
+    --font-body,
+    ui-monospace,
+    "SFMono-Regular",
+    Menlo,
+    monospace
+  );
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
 }
@@ -121,16 +127,17 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 59;
-  background: repeating-linear-gradient(to bottom,
-      rgba(0, 0, 0, 0.16) 0px,
-      rgba(0, 0, 0, 0.16) 1px,
-      transparent 1px,
-      transparent 3px);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.16) 0px,
+    rgba(0, 0, 0, 0.16) 1px,
+    transparent 1px,
+    transparent 3px
+  );
   opacity: 0.5;
 }
 
 @keyframes trackingGlitch {
-
   0%,
   92%,
   100% {
@@ -164,11 +171,13 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 61;
-  background: repeating-linear-gradient(to bottom,
-      rgba(150, 160, 170, 0.06) 0px,
-      rgba(150, 160, 170, 0.06) 2px,
-      transparent 2px,
-      transparent 5px);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(150, 160, 170, 0.06) 0px,
+    rgba(150, 160, 170, 0.06) 2px,
+    transparent 2px,
+    transparent 5px
+  );
   animation: trackingGlitch 9s infinite;
 }
 
@@ -177,7 +186,11 @@ body {
   inset: 0;
   pointer-events: none;
   z-index: 58;
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.75) 100%);
+  background: radial-gradient(
+    ellipse at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.75) 100%
+  );
 }
 
 .corruption-root {
@@ -202,7 +215,6 @@ body {
 }
 
 @keyframes chase-shake {
-
   0%,
   100% {
     transform: translate(0, 0);
@@ -222,7 +234,6 @@ body {
 }
 
 @keyframes flicker {
-
   0%,
   96%,
   100% {
@@ -255,7 +266,6 @@ body {
 }
 
 @keyframes recPulse {
-
   0%,
   100% {
     opacity: 1;
@@ -324,7 +334,9 @@ body {
 
 .jumpscare-punch {
   position: relative;
-  animation: punch-zoom 0.45s cubic-bezier(.1, 1.8, .3, 1) both, screamer-jitter 0.05s steps(2) infinite;
+  animation:
+    punch-zoom 0.45s cubic-bezier(0.1, 1.8, 0.3, 1) both,
+    screamer-jitter 0.05s steps(2) infinite;
 }
 
 @keyframes punch-zoom {
@@ -369,7 +381,6 @@ body {
 }
 
 @keyframes screen-shake {
-
   0%,
   100% {
     transform: translate(0, 0);
@@ -410,7 +421,6 @@ body {
 }
 
 @keyframes caretBlink {
-
   0%,
   49% {
     opacity: 1;
@@ -432,4 +442,3 @@ body {
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
-

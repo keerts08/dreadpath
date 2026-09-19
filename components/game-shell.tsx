@@ -22,8 +22,8 @@ export default function GameShell() {
   const hydrated = useHydrated();
   const router = useRouter();
   const [scareShown, setScareShown] = useState(false);
-  const [doorSpawn, setDoorSpawn] = useState<Vec2 | null>(null)
-  const [paused, setPaused] = useState(false)
+  const [doorSpawn, setDoorSpawn] = useState<Vec2 | null>(null);
+  const [paused, setPaused] = useState(false);
 
   const started = useGameStore((s) => s.started);
   const ending = useGameStore((s) => s.ending);
@@ -39,7 +39,7 @@ export default function GameShell() {
   const log = useGameStore((s) => s.log);
   const audioEnabled = useGameStore((s) => s.audioEnabled);
   const volume = useGameStore((s) => s.volume);
-  const reduceMotion = useGameStore((s) => s.reduceMotion)
+  const reduceMotion = useGameStore((s) => s.reduceMotion);
 
   const move = useGameStore((s) => s.move);
   const interact = useGameStore((s) => s.interact);
@@ -49,8 +49,8 @@ export default function GameShell() {
   const pulseNosie = useGameStore((s) => s.pulseNosie);
   const capture = useGameStore((s) => s.capture);
   const toggleAudio = useGameStore((s) => s.toggleAudio);
-  const toggleVolume = useGameStore((s) => s.setVolume)
-  const toggleReduceMotion = useGameStore((s) => s.toggleReduceMotion)
+  const toggleVolume = useGameStore((s) => s.setVolume);
+  const toggleReduceMotion = useGameStore((s) => s.toggleReduceMotion);
   const newGame = useGameStore((s) => s.newGame);
 
   const isHiddenRef = useRef(isHidden);
@@ -63,22 +63,27 @@ export default function GameShell() {
   useEffect(() => {
     if (!started || ending || paused) return;
     const id = setInterval(ambientTick, AMBIENT_TICK_MS);
-    return () => clearInterval(id); 
-    }, [started, ending, paused, ambientTick])
+    return () => clearInterval(id);
+  }, [started, ending, paused, ambientTick]);
 
-    useEffect(() => {
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === "Escape") setPaused((p) => !p);
-      }
-      window.addEventListener("keydown", onKey)
-      return () => window.removeEventListener("keydown", onKey)
-    }, [])
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setPaused((p) => !p);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
-  const handleUseExit = useCallback((exit: ExitDef) => {
-    const door = LAYOUTS[currentRoom].doors.find((d) => d.exitLabel === exit.label);
-    if (door) setDoorSpawn(door.spawn)  
-    move(exit)
-  }, [currentRoom, move]);
+  const handleUseExit = useCallback(
+    (exit: ExitDef) => {
+      const door = LAYOUTS[currentRoom].doors.find(
+        (d) => d.exitLabel === exit.label,
+      );
+      if (door) setDoorSpawn(door.spawn);
+      move(exit);
+    },
+    [currentRoom, move],
+  );
 
   const handleInteract = useCallback(
     (h: HotspotDef) => interact(h),
@@ -108,7 +113,7 @@ export default function GameShell() {
 
   const room = ROOMS[currentRoom];
   const layout = LAYOUTS[currentRoom];
-  const spawnPoint = doorSpawn ?? layout.playerStart
+  const spawnPoint = doorSpawn ?? layout.playerStart;
   const band = tensionBand(entity.distance);
   const lowSanity = sanity < 40;
 
@@ -134,7 +139,11 @@ export default function GameShell() {
         <div className="fixed inset-0 z-[92] bg-black/90">paused</div>
       )}
 
-      <CorruptionWrapper band={band} lowSanity={lowSanity} reduceMotion={reduceMotion}>
+      <CorruptionWrapper
+        band={band}
+        lowSanity={lowSanity}
+        reduceMotion={reduceMotion}
+      >
         <div className="mx-auto max-w-6xl px-4 py-6">
           <MapPanel currentRoom={currentRoom} visitedRooms={visitedRooms} />
           <StatusHUD
@@ -161,7 +170,7 @@ export default function GameShell() {
             onCaught={handleCaught}
           />
           <p>{room.description}</p>
-<ActionLog entries={log} />
+          <ActionLog entries={log} />
           <Inventory items={inventory} />
         </div>
       </CorruptionWrapper>

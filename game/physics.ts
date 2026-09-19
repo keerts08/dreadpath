@@ -18,7 +18,7 @@ export function dist(a: Vec2, b: Vec2) {
 }
 
 export function lerp(a: number, b: number, t: number) {
-  return a + (b-a) * t;
+  return a + (b - a) * t;
 }
 
 export function lerpVec(a: Vec2, b: Vec2, t: number): Vec2 {

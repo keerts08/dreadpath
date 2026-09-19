@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import HomeLayout from "@/components/home-layout";
 import Layer from "@/components/layer";
 import {
@@ -20,8 +20,8 @@ export default function Home() {
 
   const begin = (fresh: boolean) => {
     if (fresh) newGame();
-    router.push("/play")
-  }
+    router.push("/play");
+  };
   return (
     <HomeLayout>
       <div className="min-h-screen flex items-center justify-center px-4">

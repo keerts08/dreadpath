@@ -28,12 +28,7 @@ export type NoiseLevel = "none" | "low" | "medium" | "high";
 export type Ending = "escaped" | "banished" | "caught" | "madness" | null;
 
 export type LogTone =
-  | "narration"
-  | "system"
-  | "dread"
-  | "whisper"
-  | "item"
-  | "hallucination";
+  "narration" | "system" | "dread" | "whisper" | "item" | "hallucination";
 
 export interface LogEntry {
   id: string;
@@ -122,7 +117,7 @@ export interface RectZone {
 export interface DoorZone {
   exitLabel: string;
   zone: RectZone;
-  spawn: Vec2,
+  spawn: Vec2;
 }
 
 export interface HotspotZone {
@@ -139,4 +134,3 @@ export interface RoomLayout {
   hotspotZones: HotspotZone[];
   entitySpawn: Vec2;
 }
-
