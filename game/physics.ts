@@ -36,7 +36,7 @@ export function moveWithCollision(
 
   const blocked = (px: number, py: number) => {
     if (px - radius < 0 || px + radius > bounds.width) return true;
-    if (py - radius < 0 || py + radius > bounds.width) return true;
+    if (py - radius < 0 || py + radius > bounds.height) return true;
     for (const w of walls) {
       if (
         px + radius > w.x &&

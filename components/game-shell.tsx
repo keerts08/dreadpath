@@ -103,6 +103,7 @@ export default function GameShell() {
 
   if (!started) {
     router.replace("/");
+    return null;
   }
 
   const room = ROOMS[currentRoom];

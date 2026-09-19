@@ -4,15 +4,30 @@ import { useEffect, useRef } from "react";
 
 export default function NoiseBackground() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  let wWidth: number;
-  let wHeight: number;
-  const noiseData: ImageData[] = [];
-  let frame = 0;
-  let loopTimeout: number;
-  let resizeThrottle: number;
+  const state = useRef({
+    wWidth: 0,
+    wHeight: 0,
+    noiseData: [] as ImageData[],
+    frame: 0,
+    loopTimeout: 0,
+    resizeThrottle: 0,
+  })
 
-  const createNoise = (ctx: CanvasRenderingContext2D) => {
-    const idata = ctx.createImageData(wWidth, wHeight);
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) {
+      throw new Error("Canvas not found")
+    }
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      throw new Error("2D context not supported or canvas not found")
+    }
+
+    const s = state.current
+
+     const createNoise = () => {
+    const idata = ctx.createImageData(s.wWidth, s.wHeight);
     const buffer32 = new Uint32Array(idata.data.buffer);
     let len = buffer32.length;
 
@@ -20,64 +35,53 @@ export default function NoiseBackground() {
       buffer32[len] = ((Math.random() * 30) | 0) << 24;
     }
 
-    noiseData.push(idata);
+    s.noiseData.push(idata);
   };
 
-  const paintNoise = (ctx: CanvasRenderingContext2D) => {
-    if (frame === 9) {
-      frame = 0;
+   const paintNoise = () => {
+    if (s.frame === 9) {
+      s.frame = 0;
     } else {
-      frame++;
+      s.frame++;
     }
 
-    ctx.putImageData(noiseData[frame], 0, 0);
+    ctx.putImageData(s.noiseData[s.frame], 0, 0);
   };
 
-  const loop = (ctx: CanvasRenderingContext2D) => {
-    paintNoise(ctx);
+  const loop = () => {
+    paintNoise();
 
-    loopTimeout = window.setTimeout(() => {
-      window.requestAnimationFrame(() => loop(ctx));
+    s.loopTimeout = window.setTimeout(() => {
+      window.requestAnimationFrame(loop);
     }, 1000 / 25);
   };
 
-  const setup = (ctx: CanvasRenderingContext2D) => {
-    wWidth = window.innerWidth;
-    wHeight = window.innerHeight + 100;
+  const setup = () => {
+    s.wWidth = window.innerWidth;
+    s.wHeight = window.innerHeight + 100;
 
-    if (canvasRef.current) {
-      canvasRef.current.width = wWidth;
-      canvasRef.current.height = wHeight;
-    }
+   
+      canvas.width = s.wWidth;
+      canvas.height = s.wHeight;
+   
 
-    noiseData.length = 0;
+    s.noiseData.length = 0;
 
     for (let i = 0; i < 10; i++) {
-      createNoise(ctx);
+      createNoise();
     }
 
-    loop(ctx);
+    loop();
   };
 
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) {
-      throw new Error("Canvas not found");
-    }
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) {
-      throw new Error("2D context not supported or canvas not found");
-    }
-
-    setup(ctx);
+  setup()
 
     const resizeHandler = () => {
-      window.clearTimeout(resizeThrottle);
+      window.clearTimeout(s.resizeThrottle);
 
-      resizeThrottle = window.setTimeout(() => {
-        window.clearTimeout(loopTimeout);
-        setup(ctx);
+      s.resizeThrottle = window.setTimeout(() => {
+        window.clearTimeout(s.loopTimeout);
+        setup();
       }, 200);
     };
 
@@ -85,8 +89,8 @@ export default function NoiseBackground() {
 
     return () => {
       window.removeEventListener("resize", resizeHandler);
-      window.clearTimeout(loopTimeout);
-      window.clearTimeout(resizeThrottle);
+      window.clearTimeout(s.loopTimeout);
+      window.clearTimeout(s.resizeThrottle);
     };
   }, []);
 

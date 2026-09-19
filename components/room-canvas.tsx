@@ -150,6 +150,7 @@ export default function RoomCanvas({
       }
       if (k === "e") {
         e.preventDefault();
+        if (latest.current.paused) return;
         const h = nearbyHotspot.current;
         if (h) {
           if (h.isHideSpot) latest.current.onToggleHide(h);
