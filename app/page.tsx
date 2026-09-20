@@ -57,7 +57,7 @@ export default function Home() {
           <div className="space-y-3">
             <Button
               onClick={() => begin(true)}
-              variant="outline"
+             
               className="w-full border-line py-3 text-sm tracking-widest hover:border-amber hover:text-amber"
             >
               PLAY
@@ -66,7 +66,7 @@ export default function Home() {
             {canContinue && (
               <Button
                 onClick={() => begin(false)}
-                variant="outline"
+              
                 className="w-full border-line py-3 text-sm tracking-widest hover:border-amber hover:text-amber"
               >
                 CONTINUE
@@ -75,7 +75,6 @@ export default function Home() {
 
             <Button
               onClick={() => setSettingsOpen(true)}
-              variant="outline"
               className="w-full border-line py-3 text-sm tracking-widest text-ink-dim hover:border-ink-dim hover:text-ink"
             >
               SETTINGS
@@ -85,7 +84,6 @@ export default function Home() {
               <DialogTrigger
                 render={
                   <Button
-                    variant="outline"
                     className="w-full border-line py-3 text-sm tracking-widest text-ink-dim hover:border-ink-dim hover:text-ink"
                   >
                     HOW TO PLAY
