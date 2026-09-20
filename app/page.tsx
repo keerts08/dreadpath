@@ -1,22 +1,22 @@
 "use client";
+import { useState } from "react";
 import HomeLayout from "@/components/home-layout";
 import Layer from "@/components/layer";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTrigger,
   DialogDescription,
-  DialogTitle,
   DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import { houseAudio } from "@/game/audio";
 import { useGameStore } from "@/game/store";
 import { hasSaveGame, useHydrated } from "@/game/useHydrated";
-import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
 
 export default function Home() {
   const router = useRouter();
@@ -26,11 +26,11 @@ export default function Home() {
   const audioEnabled = useGameStore((s) => s.audioEnabled);
   const volume = useGameStore((s) => s.volume);
   const reduceMotion = useGameStore((s) => s.reduceMotion);
+  const toggleAudio = useGameStore((s) => s.toggleAudio);
   const setVolume = useGameStore((s) => s.setVolume);
-  const toggeAudio = useGameStore((s) => s.toggleAudio);
   const toggleReduceMotion = useGameStore((s) => s.toggleReduceMotion);
 
-  const [settingsOpen, setSettingOpen] = useState(false)
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const canContinue = hydrated && hasSaveGame();
 
@@ -39,6 +39,7 @@ export default function Home() {
     if (fresh) newGame();
     router.push("/play");
   };
+
   return (
     <HomeLayout>
       <div className="min-h-screen flex items-center justify-center px-4">
@@ -52,6 +53,7 @@ export default function Home() {
               SOMETHING ELSE LIVES HERE
             </p>
           </div>
+
           <div className="space-y-3">
             <Button
               onClick={() => begin(true)}
@@ -60,6 +62,7 @@ export default function Home() {
             >
               PLAY
             </Button>
+
             {canContinue && (
               <Button
                 onClick={() => begin(false)}
@@ -69,13 +72,15 @@ export default function Home() {
                 CONTINUE
               </Button>
             )}
+
             <Button
-              onClick={() => setSettingOpen(true)}
+              onClick={() => setSettingsOpen(true)}
               variant="outline"
               className="w-full border-line py-3 text-sm tracking-widest text-ink-dim hover:border-ink-dim hover:text-ink"
             >
               SETTINGS
             </Button>
+
             <Dialog>
               <DialogTrigger
                 render={
@@ -120,6 +125,7 @@ export default function Home() {
                     to end.
                   </p>
                 </div>
+
                 <DialogFooter>
                   <DialogClose
                     render={
@@ -135,7 +141,7 @@ export default function Home() {
               </DialogContent>
             </Dialog>
 
-            <Dialog open={settingsOpen} onOpenChange={setSettingOpen}>
+            <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
               <DialogContent
                 showCloseButton={false}
                 className="max-w-sm bg-panel text-ink-dim ring-line"
@@ -150,10 +156,10 @@ export default function Home() {
                 </DialogHeader>
 
                 <div className="space-y-5">
-                  <div className="flex item-center justify-between">
+                  <div className="flex items-center justify-between text-sm">
                     <span>SOUND</span>
                     <Button
-                      onClick={toggeAudio}
+                      onClick={toggleAudio}
                       variant="outline"
                       size="sm"
                       className={
@@ -165,7 +171,8 @@ export default function Home() {
                       {audioEnabled ? "ON" : "OFF"}
                     </Button>
                   </div>
-                  <div className="space-y-1">
+
+                  <div className="space-y-2">
                     <div className="flex items-center justify-between text-[11px] tracking-widest text-ink-faint">
                       <span>VOLUME</span>
                       <span className="text-ink tabular-nums">
@@ -195,6 +202,7 @@ export default function Home() {
                     REDUCE SCREEN SHAKE
                   </label>
                 </div>
+
                 <DialogFooter>
                   <DialogClose
                     render={
