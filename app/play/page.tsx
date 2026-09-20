@@ -1,3 +1,5 @@
+"use client";
+
 import { LAYOUTS } from "@/game/layouts";
 import { useGameStore } from "@/game/store";
 import { useHydrated } from "@/game/useHydrated";
