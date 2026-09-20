@@ -5,20 +5,37 @@ import {
   Dialog,
   DialogClose,
   DialogContent,
+  DialogHeader,
   DialogTrigger,
+  DialogDescription,
+  DialogTitle,
+  DialogFooter,
 } from "@/components/ui/dialog";
+import { houseAudio } from "@/game/audio";
 import { useGameStore } from "@/game/store";
 import { hasSaveGame, useHydrated } from "@/game/useHydrated";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 export default function Home() {
   const router = useRouter();
   const hydrated = useHydrated();
   const newGame = useGameStore((s) => s.newGame);
 
+  const audioEnabled = useGameStore((s) => s.audioEnabled);
+  const volume = useGameStore((s) => s.volume);
+  const reduceMotion = useGameStore((s) => s.reduceMotion);
+  const setVolume = useGameStore((s) => s.setVolume);
+  const toggeAudio = useGameStore((s) => s.toggleAudio);
+  const toggleReduceMotion = useGameStore((s) => s.toggleReduceMotion);
+
+  const [settingsOpen, setSettingOpen] = useState(false)
+
   const canContinue = hydrated && hasSaveGame();
 
   const begin = (fresh: boolean) => {
+    houseAudio.ensureStarted();
     if (fresh) newGame();
     router.push("/play");
   };
@@ -36,57 +53,160 @@ export default function Home() {
             </p>
           </div>
           <div className="space-y-3">
-            <button
+            <Button
               onClick={() => begin(true)}
-              className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors"
+              variant="outline"
+              className="w-full border-line py-3 text-sm tracking-widest hover:border-amber hover:text-amber"
             >
               PLAY
-            </button>
+            </Button>
             {canContinue && (
-              <button
+              <Button
                 onClick={() => begin(false)}
-                className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors"
+                variant="outline"
+                className="w-full border-line py-3 text-sm tracking-widest hover:border-amber hover:text-amber"
               >
                 CONTINUE
-              </button>
+              </Button>
             )}
+            <Button
+              onClick={() => setSettingOpen(true)}
+              variant="outline"
+              className="w-full border-line py-3 text-sm tracking-widest text-ink-dim hover:border-ink-dim hover:text-ink"
+            >
+              SETTINGS
+            </Button>
             <Dialog>
               <DialogTrigger
                 render={
-                  <button className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-ink-dim hover:text-ink transition-colors">
+                  <Button
+                    variant="outline"
+                    className="w-full border-line py-3 text-sm tracking-widest text-ink-dim hover:border-ink-dim hover:text-ink"
+                  >
                     HOW TO PLAY
-                  </button>
+                  </Button>
                 }
               />
-              <DialogContent className="max-w-md border bg-panel p-5 space-y-3 text-sm text-ink-dim leading-relaxed text-left border-line">
-                <h2 className="font-display text-base text-bone tracking-widest">
-                  HOW TO PLAY
-                </h2>
-                <p>
-                  You wake up inside Ravenshade Manor with no memory of how you
-                  got there. Explore the house, gather what you find, and get
-                  out.
-                </p>
-                <p>
-                  You are not alone. Every action — moving, searching, forcing
-                  something open — makes noise, and noise draws it closer.
-                  Careful, quiet play is safer than rushing.
-                </p>
-                <p>
-                  If it gets close, look for somewhere to hide. Staying hidden
-                  too long isn&rsquo;t free either — it will start to check.
-                </p>
-                <p>
-                  There may be more than one way for your night in this house to
-                  end.
-                </p>
-                <DialogClose
-                  render={
-                    <button className="mt-2 border border-line px-4 py-2 text-xs tracking-widest hover:border-amber hover:text-amber">
-                      CLOSE
-                    </button>
-                  }
-                />
+              <DialogContent
+                showCloseButton={false}
+                className="max-w-md bg-panel text-ink-dim ring-line"
+              >
+                <DialogHeader>
+                  <DialogTitle className="font-display text-base text-bone tracking-widest">
+                    HOW TO PLAY
+                  </DialogTitle>
+                  <DialogDescription className="sr-only">
+                    How to play Dreadpath
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-3 text-sm leading-relaxed text-left">
+                  <p>
+                    You wake up inside Ravenshade Manor with no memory of how
+                    you got there. Explore the house, gather what you find, and
+                    get out.
+                  </p>
+                  <p>
+                    You are not alone. Every action — moving, searching, forcing
+                    something open — makes noise, and noise draws it closer.
+                    Careful, quiet play is safer than rushing.
+                  </p>
+                  <p>
+                    If it gets close, look for somewhere to hide. Staying hidden
+                    too long isn&rsquo;t free either — it will start to check.
+                  </p>
+                  <p>
+                    There may be more than one way for your night in this house
+                    to end.
+                  </p>
+                </div>
+                <DialogFooter>
+                  <DialogClose
+                    render={
+                      <Button
+                        variant="outline"
+                        className="text-xs tracking-widest hover:border-amber hover:text-amber"
+                      >
+                        CLOSE
+                      </Button>
+                    }
+                  />
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog open={settingsOpen} onOpenChange={setSettingOpen}>
+              <DialogContent
+                showCloseButton={false}
+                className="max-w-sm bg-panel text-ink-dim ring-line"
+              >
+                <DialogHeader>
+                  <DialogTitle className="font-display text-base text-bone tracking-widest">
+                    SETTINGS
+                  </DialogTitle>
+                  <DialogDescription className="sr-only">
+                    Sound and accessibility settings
+                  </DialogDescription>
+                </DialogHeader>
+
+                <div className="space-y-5">
+                  <div className="flex item-center justify-between">
+                    <span>SOUND</span>
+                    <Button
+                      onClick={toggeAudio}
+                      variant="outline"
+                      size="sm"
+                      className={
+                        audioEnabled
+                          ? "border-amber text-amber"
+                          : "border-line text-ink-dim"
+                      }
+                    >
+                      {audioEnabled ? "ON" : "OFF"}
+                    </Button>
+                  </div>
+                  <div className="space-y-1">
+                    <div className="flex items-center justify-between text-[11px] tracking-widest text-ink-faint">
+                      <span>VOLUME</span>
+                      <span className="text-ink tabular-nums">
+                        {Math.round(volume * 100)}%
+                      </span>
+                    </div>
+                    <input
+                      type="range"
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={volume}
+                      onChange={(e) => setVolume(Number(e.target.value))}
+                      disabled={!audioEnabled}
+                      className="w-full accent-amber"
+                      aria-label="Volume"
+                    />
+                  </div>
+
+                  <label className="flex items-center gap-2 text-[11px] tracking-widest text-ink-faint">
+                    <input
+                      type="checkbox"
+                      checked={reduceMotion}
+                      onChange={toggleReduceMotion}
+                      className="accent-amber"
+                    />
+                    REDUCE SCREEN SHAKE
+                  </label>
+                </div>
+                <DialogFooter>
+                  <DialogClose
+                    render={
+                      <Button
+                        variant="outline"
+                        className="text-xs tracking-widest hover:border-amber hover:text-amber"
+                      >
+                        CLOSE
+                      </Button>
+                    }
+                  />
+                </DialogFooter>
               </DialogContent>
             </Dialog>
 

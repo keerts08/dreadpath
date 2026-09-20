@@ -12,3 +12,4 @@ stuff i ref and used ai for:
 - used ai to make the test page (deleted)
 - used ai to draw entity, hotspots (partially) and player
 - used ai for full furniture art
+- house audio ai gen 
