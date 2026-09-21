@@ -18,8 +18,10 @@ import { useGameStore } from "@/game/store";
 import { hasSaveGame, useHydrated } from "@/game/useHydrated";
 import { useRouter } from "next/navigation";
 
-import { Ending } from "@/game/types";
+import { Difficulty, Ending } from "@/game/types";
 import { CONTENT } from "@/components/ending-screen";
+
+const DIFFICULTIES: Difficulty[] = ["easy", "normal", "hard"];
 
 const ALL_ENDINGS: Exclude<Ending, null>[] = [
   "escaped",
@@ -68,6 +70,24 @@ export default function Home() {
             <p className="text-xs tracking-widest text-ink-faint caret">
               SOMETHING ELSE LIVES HERE
             </p>
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex gap-2">
+              {DIFFICULTIES.map((d) => (
+                <Button
+                  key={d}
+                  onClick={() => setDifficulty(d)}
+                  className={`flex-1 border px-3 py-2 text-xs tracking-widest uppercase transition-colors ${
+                    difficulty === d
+                      ? "border-amber text-amber"
+                      : "border-line text-ink-dim hover:border-ink-dim hover:text-ink"
+                  }`}
+                >
+                  {d}
+                </Button>
+              ))}
+            </div>
           </div>
 
           <div className="space-y-3">
