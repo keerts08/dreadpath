@@ -17,6 +17,9 @@ import RoomCanvas from "@/components/room-canvas";
 import Inventory from "@/components/inventory";
 import { ExitDef, HotspotDef, Vec2 } from "@/game/types";
 import ActionLog from "@/components/action-log";
+import AmbientAudioEngine from "@/components/audio-engine";
+import { Button } from "@/components/ui/button";
+import { AnimatePresence, motion } from "motion/react";
 
 const AMBIENT_TICK_MS = 4200;
 
@@ -137,8 +140,31 @@ export default function GameShell() {
         />
       )}
 
+      <AmbientAudioEngine />
+
       {paused && !ending && (
-        <div className="fixed inset-0 z-[92] bg-black/90">paused</div>
+        <div className="fixed inset-0 z-[92] bg-black/90 flex items-center justify-center p-6">
+          <div className="max-w-sm w-full text-center space-y-6">
+            <h2 className="font-display text-2xl tracking-widest text-bone">
+              PAUSED
+            </h2>
+            <p className="text-xs text-ink-faint">The house waits too.</p>
+            <div className="space-y-3">
+              <Button
+                onClick={() => setPaused(false)}
+                className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors"
+              >
+                RESUME
+              </Button>
+              <Button
+                onClick={() => router.push("/")}
+                className="w-full border border-line px-6 py-3 text-sm tracking-widest text-ink-dim hover:border-ink-dim hover:text-ink transition-colors"
+              >
+                QUIT TO MENU
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
 
       <CorruptionWrapper
@@ -146,34 +172,81 @@ export default function GameShell() {
         lowSanity={lowSanity}
         reduceMotion={reduceMotion}
       >
-        <div className="mx-auto max-w-6xl px-4 py-6">
-          <MapPanel currentRoom={currentRoom} visitedRooms={visitedRooms} />
-          <StatusHUD
-            sanity={sanity}
-            band={band}
-            isHidden={isHidden}
-            turn={turn}
-          />
+        <div className="mx-auto max-w-6xl px-4 py-6 space-y-3">
+          <header className="flex items-center justify-between border-b border-line pb-2">
+            <h1 className="font-display text-sm tracking-widest text-ink-dim">
+              DREADPATH
+            </h1>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => setPaused(true)}
+                className="rounded-none border-line bg-transparent text-xs tracking-widest text-ink-dim shadow-none h-auto px-3 py-1 hover:border-amber hover:text-amber"
+              >
+                PAUSE
+              </Button>
 
-          <RoomCanvas
-            room={room}
-            layout={layout}
-            spawn={spawnPoint}
-            flags={flags}
-            resolvedHotspots={resolvedHotspots}
-            isHidden={isHidden}
-            paused={paused}
-            entityDistance={entity.distance}
-            keysDown={keysDown}
-            onInteractHotspot={handleInteract}
-            onToggleHide={handleToggleHide}
-            onUseExit={handleUseExit}
-            onRunNoise={handleRunNoise}
-            onCaught={handleCaught}
-          />
-          <p>{room.description}</p>
-          <ActionLog entries={log} />
-          <Inventory items={inventory} />
+              <Button className="rounded-none border-line bg-transparent text-xs tracking-widest text-ink-dim shadow-none h-auto px-3 py-1 hover:border-amber hover:text-amber">
+                HELP DIALOG HERE
+              </Button>
+
+              <Button
+                onClick={toggleAudio}
+                className="rounded-none border-line bg-transparent text-xs tracking-widest text-ink-dim shadow-none h-auto px-3 py-1 hover:border-amber hover:text-amber"
+              >
+                SOUND: {audioEnabled ? "ON" : "OFF"}
+              </Button>
+            </div>
+          </header>
+
+          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_240px] gap-3 items-start">
+            <div className="order-2 lg:order-1 space-y-3">
+              <MapPanel currentRoom={currentRoom} visitedRooms={visitedRooms} />
+              <div className="border border-line bg-panel/60 p-3 space-y-3">
+                <StatusHUD
+                  sanity={sanity}
+                  band={band}
+                  isHidden={isHidden}
+                  turn={turn}
+                />
+              </div>
+            </div>
+
+            <div className="order-1 lg:order-2 space-y-3">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={currentRoom}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.22, ease: "easeInOut" }}
+                >
+                  <RoomCanvas
+                    room={room}
+                    layout={layout}
+                    spawn={spawnPoint}
+                    flags={flags}
+                    resolvedHotspots={resolvedHotspots}
+                    isHidden={isHidden}
+                    paused={paused}
+                    entityDistance={entity.distance}
+                    keysDown={keysDown}
+                    onInteractHotspot={handleInteract}
+                    onToggleHide={handleToggleHide}
+                    onUseExit={handleUseExit}
+                    onRunNoise={handleRunNoise}
+                    onCaught={handleCaught}
+                  />
+                </motion.div>
+              </AnimatePresence>
+              <p className="text-sm text-ink-dim italic leading-relaxed">
+                {room.description}
+              </p>
+              <ActionLog entries={log} />
+            </div>
+            <div className="order-3 space-y-3">
+              <Inventory items={inventory} />
+            </div>
+          </div>
         </div>
       </CorruptionWrapper>
     </div>
