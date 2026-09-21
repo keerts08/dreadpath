@@ -143,7 +143,7 @@ export default function GameShell() {
   return (
     <div className="min-h-screen">
       <Layer />
-      {showJumpscare && <JumpscareOverlay onDone={() => setScareShown(true)} />}
+      {showJumpscare && <JumpscareOverlay onDone={() => setScareShown(true)} reduceMotion={reduceMotion} />}
       {showEnding && (
         <EndingScreen
           ending={ending}

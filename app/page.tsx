@@ -18,6 +18,16 @@ import { useGameStore } from "@/game/store";
 import { hasSaveGame, useHydrated } from "@/game/useHydrated";
 import { useRouter } from "next/navigation";
 
+import { Ending } from "@/game/types";
+import { CONTENT } from "@/components/ending-screen";
+
+const ALL_ENDINGS: Exclude<Ending, null>[] = [
+  "escaped",
+  "banished",
+  "caught",
+  "madness",
+];
+
 const BUTTON =
   "w-full rounded-none border-line bg-transparent py-3 text-sm tracking-widest shadow-none h-auto";
 
@@ -29,6 +39,9 @@ export default function Home() {
   const audioEnabled = useGameStore((s) => s.audioEnabled);
   const volume = useGameStore((s) => s.volume);
   const reduceMotion = useGameStore((s) => s.reduceMotion);
+  const difficulty = useGameStore((s) => s.difficulty)
+  const setDifficulty = useGameStore((s) => s.setDifficulty);
+  const unlockedEndings = useGameStore((s) => s.unlockedEndings);
   const toggleAudio = useGameStore((s) => s.toggleAudio);
   const setVolume = useGameStore((s) => s.setVolume);
   const toggleReduceMotion = useGameStore((s) => s.toggleReduceMotion);
@@ -60,7 +73,6 @@ export default function Home() {
           <div className="space-y-3">
             <Button
               onClick={() => begin(true)}
-              variant="outline"
               className={`${BUTTON} hover:border-amber hover:text-amber`}
             >
               PLAY
@@ -69,7 +81,6 @@ export default function Home() {
             {canContinue && (
               <Button
                 onClick={() => begin(false)}
-                variant="outline"
                 className={`${BUTTON} hover:border-amber hover:text-amber`}
               >
                 CONTINUE
@@ -78,7 +89,6 @@ export default function Home() {
 
             <Button
               onClick={() => setSettingsOpen(true)}
-              variant="outline"
               className={`${BUTTON} text-ink-dim hover:border-ink-dim hover:text-ink`}
             >
               SETTINGS
@@ -88,7 +98,49 @@ export default function Home() {
               <DialogTrigger
                 render={
                   <Button
-                    variant="outline"
+                    className={`${BUTTON} text-ink-dim hover:border-ink-dim hover:text-ink`}
+                  >
+                    ENDINGS
+                  </Button>
+                }
+              />
+              <DialogContent
+                showCloseButton={false}
+                className="max-w-md rounded-none bg-panel text-ink-dim ring-line"
+              >
+                <DialogHeader>
+                  <DialogTitle className="font-display text-base text-bone tracking-widest">
+                    ENDINGS
+                  </DialogTitle>
+                </DialogHeader>
+
+                <div className="space-y-2">
+                  {ALL_ENDINGS.map((ending) => {
+                    const unlocked = unlockedEndings.includes(ending);
+                    return (
+                      <div
+                        key={ending}
+                        className="border border-line px-3 py-2 flex items-center justify-between"
+                      >
+                        <span className="text-ink">
+                          {unlocked ? CONTENT[ending].title : "??"}
+                        </span>
+                        {!unlocked && (
+                          <span className="text-[10px] tracking-widest text-ink-faint">
+                            LOCKED
+                          </span>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger
+                render={
+                  <Button
                     className={`${BUTTON} text-ink-dim hover:border-ink-dim hover:text-ink`}
                   >
                     HOW TO PLAY

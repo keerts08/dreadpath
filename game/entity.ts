@@ -1,4 +1,4 @@
-import { EntityState, NoiseLevel } from "./types";
+import { Difficulty, EntityState, NoiseLevel } from "./types";
 
 const NOISE_VALUE: Record<NoiseLevel, number> = {
   none: 0,
@@ -7,12 +7,19 @@ const NOISE_VALUE: Record<NoiseLevel, number> = {
   high: 13,
 };
 
+const DIFFICULTY_MULTIPLIER: Record<Difficulty, number> = {
+  easy: 0.65,
+  normal: 1,
+  hard: 1.4,
+};
+
 export interface EntityTickInput {
   entity: EntityState;
   noise: NoiseLevel;
   dangerLevel: 0 | 1 | 2 | 3;
   isHidden: boolean;
   hideStreak: number;
+  difficulty: Difficulty;
 }
 
 export interface EntityTickResult {
@@ -27,7 +34,8 @@ function clamp(n: number, min: number, max: number) {
 }
 
 export function tickEntity(input: EntityTickInput): EntityTickResult {
-  const { entity, noise, dangerLevel, isHidden, hideStreak } = input;
+  const { entity, noise, dangerLevel, isHidden, hideStreak, difficulty } =
+    input;
   let { distance, alertness } = entity;
 
   const noiseValue = NOISE_VALUE[noise];
@@ -43,6 +51,7 @@ export function tickEntity(input: EntityTickInput): EntityTickResult {
   if (isHidden) {
     const recover = 9 + Math.random() * 6;
     distance = clamp(distance + recover, 0, 100);
+
     const findChance = alertness > 75 ? 0.05 + hideStreak * 0.02 : 0.01;
     if (Math.random() < findChance) {
       foundWhileHidden = true;
@@ -54,7 +63,10 @@ export function tickEntity(input: EntityTickInput): EntityTickResult {
     const alertPull = alertness / 28;
     const dangerPull = dangerLevel * 0.4;
     const wander = Math.random() < 0.2 ? -(Math.random() * 4) : 0;
-    distance = clamp(distance - base - alertPull - dangerPull - wander, 0, 100);
+    const pull =
+      (base + alertPull + dangerPull + wander) *
+      DIFFICULTY_MULTIPLIER[difficulty];
+    distance = clamp(distance - pull, 0, 100);
   }
 
   const captured = !isHidden && distance <= 0;

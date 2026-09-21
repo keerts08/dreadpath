@@ -1,3 +1,6 @@
+"use client";
+
+import { RefObject, useEffect, useRef } from "react";
 import { ExitDef, HotspotDef, RoomDef, RoomLayout, Vec2 } from "@/game/types";
 import {
   clamp,
@@ -6,7 +9,7 @@ import {
   moveWithCollision,
   rectContains,
 } from "@/game/physics";
-import { RefObject, useEffect, useRef } from "react";
+import { houseAudio } from "@/game/audio";
 import { drawHotspotIcon } from "./furniture-art";
 
 const WALK_SPEED = 190;
@@ -17,6 +20,8 @@ const CAPTURE_RADIUS = PLAYER_RADIUS + ENTITY_RADIUS - 6;
 const INTERACT_PAD = 18;
 const ENTITY_ACTIVATION_DISTANCE = 32;
 const RUN_NOISE_INTERVAL_MS = 850;
+const FOOTSTEP_INTERVAL_MS = 340;
+const RUN_FOOTSTEP_INTERVAL_MS = 220;
 const SPAWN_GRACE_FRAMES = 24;
 const LIGHT_INNER_RADIUS = 65;
 const LIGHT_OUTER_RADIUS = 190;
@@ -78,16 +83,16 @@ export default function RoomCanvas({
   const playerPos = useRef<Vec2>({ ...spawn });
   const facing = useRef<Vec2>({ x: 0, y: 1 });
   const insideDoors = useRef<Set<string>>(new Set());
+  const spawnFrameCount = useRef(0);
   const hasBeenCaught = useRef(false);
+  const lightJitter = useRef(0);
   const nearbyHotspot = useRef<HotspotDef | null>(null);
   const lastSeenPos = useRef<Vec2>({ ...spawn });
   const wasHidden = useRef(isHidden);
   const renderedEntityPos = useRef<Vec2>({ ...layout.entitySpawn });
   const renderedEntityOpacity = useRef(0);
-  const spawnFrameCount = useRef(0);
-  const lightJitter = useRef(0);
   const lastRunNoiseAt = useRef(0);
-
+  const lastFootstepAt = useRef(0);
   const lastFrameAt = useRef<number | null>(null);
   const rafId = useRef<number | null>(null);
 
@@ -162,8 +167,9 @@ export default function RoomCanvas({
         }
       }
     };
-    const up = (e: KeyboardEvent) =>
+    const up = (e: KeyboardEvent) => {
       keysDown.current.delete(e.key.toLowerCase());
+    };
     window.addEventListener("keydown", down);
     window.addEventListener("keyup", up);
     return () => {
@@ -186,6 +192,7 @@ export default function RoomCanvas({
       const {
         layout,
         isHidden,
+        paused,
         entityDistance,
         flags,
         resolvedHotspots,
@@ -208,6 +215,7 @@ export default function RoomCanvas({
           dy /= len;
           facing.current = { x: dx, y: dy };
           const speed = running ? RUN_SPEED : WALK_SPEED;
+          const prevPos = playerPos.current;
           playerPos.current = moveWithCollision(
             playerPos.current,
             { x: dx * speed * dt, y: dy * speed * dt },
@@ -215,6 +223,19 @@ export default function RoomCanvas({
             { width: layout.width, height: layout.height },
             layout.walls,
           );
+
+          const actuallyMoved =
+            playerPos.current.x !== prevPos.x ||
+            playerPos.current.y !== prevPos.y;
+          if (actuallyMoved) {
+            const footstepInterval = running
+              ? RUN_FOOTSTEP_INTERVAL_MS
+              : FOOTSTEP_INTERVAL_MS;
+            if (t - lastFootstepAt.current > footstepInterval) {
+              lastFootstepAt.current = t;
+              houseAudio.footstep();
+            }
+          }
 
           if (running && t - lastRunNoiseAt.current > RUN_NOISE_INTERVAL_MS) {
             lastRunNoiseAt.current = t;
@@ -230,9 +251,7 @@ export default function RoomCanvas({
         if (spawnFrameCount.current > SPAWN_GRACE_FRAMES) {
           const stillInside = new Set<string>();
           for (const door of layout.doors) {
-            const exitDef = room.exits.find(
-              (e: ExitDef) => e.label === door.exitLabel,
-            );
+            const exitDef = room.exits.find((e) => e.label === door.exitLabel);
             if (!exitDef || !exitVisible(exitDef, flags)) continue;
             if (
               rectContains(door.zone, playerPos.current, PLAYER_RADIUS * 0.4)
@@ -249,9 +268,7 @@ export default function RoomCanvas({
         nearest = null;
         let nearestDist = Infinity;
         for (const hz of layout.hotspotZones) {
-          const hotspotDef = room.hotspots.find(
-            (h: HotspotDef) => h.id === hz.hotspotId,
-          );
+          const hotspotDef = room.hotspots.find((h) => h.id === hz.hotspotId);
           if (!hotspotDef || !hotspotVisible(hotspotDef, flags)) continue;
           if (rectContains(hz.zone, playerPos.current, INTERACT_PAD)) {
             const cx = hz.zone.x + hz.zone.w / 2;
@@ -284,7 +301,6 @@ export default function RoomCanvas({
         );
         renderedEntityOpacity.current +=
           ((active ? 1 : 0) - renderedEntityOpacity.current) * 0.06;
-        lightJitter.current = Math.sin(t / 340) * 6 + Math.sin(t / 97) * 3;
 
         if (
           !isHidden &&
@@ -295,6 +311,8 @@ export default function RoomCanvas({
           hasBeenCaught.current = true;
           latest.current.onCaught();
         }
+
+        lightJitter.current = Math.sin(t / 340) * 6 + Math.sin(t / 97) * 3;
       }
 
       draw(
@@ -312,6 +330,7 @@ export default function RoomCanvas({
         flags,
         lightJitter.current,
       );
+
       rafId.current = requestAnimationFrame(frame);
     };
 

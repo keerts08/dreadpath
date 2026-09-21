@@ -82,12 +82,24 @@ function ScreamerFace() {
   );
 }
 
-export default function JumpscareOverlay({ onDone }: { onDone: () => void }) {
+export default function JumpscareOverlay({
+  onDone,
+  reduceMotion,
+}: {
+  onDone: () => void;
+  reduceMotion: boolean;
+}) {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    document.body.classList.add("shake");
-    const shakeId = setTimeout(() => document.body.classList.remove("shake"), 500);
+    if (!reduceMotion) {
+      document.body.classList.add("shake");
+    }
+
+    const shakeId = setTimeout(() => {
+      document.body.classList.remove("shake");
+    }, 500);
+
     const id = setTimeout(() => {
       setVisible(false);
       onDone();
@@ -97,7 +109,7 @@ export default function JumpscareOverlay({ onDone }: { onDone: () => void }) {
       clearTimeout(shakeId);
       document.body.classList.remove("shake");
     };
-  }, [onDone]);
+  }, [onDone, reduceMotion]);
 
   if (!visible) return null;
 

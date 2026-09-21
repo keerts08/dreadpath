@@ -27,6 +27,8 @@ export type NoiseLevel = "none" | "low" | "medium" | "high";
 
 export type Ending = "escaped" | "banished" | "caught" | "madness" | null;
 
+export type Difficulty = "easy" | "normal" | "hard";
+
 export type LogTone =
   "narration" | "system" | "dread" | "whisper" | "item" | "hallucination";
 
@@ -100,6 +102,8 @@ export interface GameState {
   audioEnabled: boolean;
   volume: number;
   reduceMotion: boolean;
+  difficulty: Difficulty;
+  unlockedEndings: Exclude<Ending, null>[];
 }
 
 export interface Vec2 {

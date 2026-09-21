@@ -1,6 +1,6 @@
 import { Ending } from "@/game/types";
 
-const CONTENT: Record<
+export const CONTENT: Record<
   Exclude<Ending, null>,
   { title: string; body: string[]; tone: string }
 > = {

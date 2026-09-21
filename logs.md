@@ -13,3 +13,4 @@ stuff i ref and used ai for:
 - used ai to draw entity, hotspots (partially) and player
 - used ai for full furniture art
 - house audio ai gen 
+- used ai to add sm comp in /play
