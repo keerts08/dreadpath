@@ -12,6 +12,7 @@ export const MAP_GRID: Record<RoomId, { col: number; row: number }> = {
   bathroom: { col: -1, row: -1 },
   bedroom: { col: 1, row: -1 },
   attic: { col: 0, row: -2 },
+  crawlspace: { col: 0, row: -3}
 };
 
 export interface MapEdge {

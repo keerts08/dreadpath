@@ -258,10 +258,32 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
         zone: { x: 400, y: 460, w: 100, h: 20 },
         spawn: NORTH_LANDING,
       },
+      {
+        exitLabel: "Squeeze Into the CrawlSpace",
+        zone: { x: 400, y: 40, w: 100, h: 20 },
+        spawn: { x: 450, y: 400 },
+      },
     ],
     hotspotZones: [
       { hotspotId: "trunk", zone: { x: 360, y: 220, w: 120, h: 70 } },
       { hotspotId: "trunkSigil", zone: { x: 500, y: 220, w: 90, h: 60 } },
+    ],
+    entitySpawn: { x: 100, y: 120 },
+  },
+  crawlspace: {
+    width: W,
+    height: H,
+    playerStart: { x: 450, y: 400 },
+    walls: [{ x: 380, y: 150, w: 140, h: 90 }],
+    doors: [
+      {
+        exitLabel: "Squeeze Back Into the Attic",
+        zone: { x: 400, y: 460, w: 100, h: 20 },
+        spawn: SOUTH_LANDING,
+      },
+    ],
+    hotspotZones: [
+      { hotspotId: "bundle", zone: { x: 380, y: 150, w: 140, h: 90 } },
     ],
     entitySpawn: { x: 100, y: 120 },
   },

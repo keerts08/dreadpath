@@ -8,7 +8,7 @@ export const CONTENT: Record<
     title: "YOU LEFT",
     tone: "text-bone",
     body: [
-      "The door gives, and cold outside air hits you like a slap. You don't look back — you've learned better than that.",
+      "The door gives, and cold outside air hits you like a slap. You don't look back - you've learned better than that.",
       "By morning you will have convinced yourself most of it was shock, and rain, and an unfamiliar house playing tricks. Most of it.",
       "Ravenshade Manor stands exactly as it always has, its door bolted three times over, waiting for the next set of headlights in the rain.",
     ],
@@ -18,7 +18,7 @@ export const CONTENT: Record<
     tone: "text-amber",
     body: [
       "Something in the house lets go of you, all at once, like a held breath finally released.",
-      "You walk out the front door under your own power, into ordinary daylight, and you understand — dimly, uselessly — that you have traded something for this. You don't yet know what.",
+      "You walk out the front door under your own power, into ordinary daylight, and you understand - dimly, uselessly - that you have traded something for this. You don't yet know what.",
       "The house is quiet behind you. For the first time since you woke here, you believe that it actually is.",
     ],
   },

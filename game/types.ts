@@ -8,7 +8,8 @@ export type RoomId =
   | "bathroom"
   | "bedroom"
   | "cellar"
-  | "attic";
+  | "attic"
+  | "crawlspace";
 
 export type ItemId =
   | "letterOpener"
@@ -21,7 +22,8 @@ export type ItemId =
   | "atticKey"
   | "sigilMoon"
   | "sigilSun"
-  | "sigilVine";
+  | "sigilVine"
+  | "fadedPhotograph";
 
 export type NoiseLevel = "none" | "low" | "medium" | "high";
 
@@ -30,7 +32,12 @@ export type Ending = "escaped" | "banished" | "caught" | "madness" | null;
 export type Difficulty = "easy" | "normal" | "hard";
 
 export type LogTone =
-  "narration" | "system" | "dread" | "whisper" | "item" | "hallucination";
+  | "narration"
+  | "system"
+  | "dread"
+  | "whisper"
+  | "item"
+  | "hallucination";
 
 export interface LogEntry {
   id: string;

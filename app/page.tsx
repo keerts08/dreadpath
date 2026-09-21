@@ -41,7 +41,7 @@ export default function Home() {
   const audioEnabled = useGameStore((s) => s.audioEnabled);
   const volume = useGameStore((s) => s.volume);
   const reduceMotion = useGameStore((s) => s.reduceMotion);
-  const difficulty = useGameStore((s) => s.difficulty)
+  const difficulty = useGameStore((s) => s.difficulty);
   const setDifficulty = useGameStore((s) => s.setDifficulty);
   const unlockedEndings = useGameStore((s) => s.unlockedEndings);
   const toggleAudio = useGameStore((s) => s.toggleAudio);
@@ -189,13 +189,13 @@ export default function Home() {
                     get out.
                   </p>
                   <p>
-                    You are not alone. Every action — moving, searching, forcing
-                    something open — makes noise, and noise draws it closer.
+                    You are not alone. Every action - moving, searching, forcing
+                    something open - makes noise, and noise draws it closer.
                     Careful, quiet play is safer than rushing.
                   </p>
                   <p>
                     If it gets close, look for somewhere to hide. Staying hidden
-                    too long isn&rsquo;t free either — it will start to check.
+                    too long isn&rsquo;t free either - it will start to check.
                   </p>
                   <p>
                     There may be more than one way for your night in this house

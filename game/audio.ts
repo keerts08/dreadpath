@@ -158,7 +158,7 @@ class HouseAudio {
   }
 
   /**
-   * A single short, filtered noise burst — a footstep. Silently does
+   * A single short, filtered noise burst - a footstep. Silently does
    * nothing if the audio graph hasn't started yet, so RoomCanvas can call
    * this freely during movement without worrying about start-up order.
    */

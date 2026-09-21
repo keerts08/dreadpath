@@ -9,9 +9,10 @@ export const ITEM_NAMES: Record<ItemId, string> = {
   kitchenKnife: "Kitchen Knife",
   copperFuse: "Copper Fuse",
   atticKey: "Small Brass Key",
-  sigilMoon: "Ward Sigil — Moon",
-  sigilSun: "Ward Sigil — Sun",
-  sigilVine: "Ward Sigil — Vine",
+  sigilMoon: "Ward Sigil - Moon",
+  sigilSun: "Ward Sigil - Sun",
+  sigilVine: "Ward Sigil - Vine",
+  fadedPhotograph: "Faded Photograph",
 };
 
 export const ITEM_DESCRIPTIONS: Record<ItemId, string> = {
@@ -34,6 +35,8 @@ export const ITEM_DESCRIPTIONS: Record<ItemId, string> = {
     "A disc of dull gold etched with rays. It hums almost below hearing.",
   sigilVine:
     "A disc of green-black bronze etched with creeping vines. It smells of wet earth.",
+  fadedPhotograph:
+    "A photograph, warped by damp, of a family standing in front of this house - except there are six people in the photo, and only five faces. Where the sixth should be, someone has scratched the emulsion away, carefully, a long time ago.",
 };
 
 export const ROOMS: Record<string, RoomDef> = {
@@ -56,7 +59,7 @@ export const ROOMS: Record<string, RoomDef> = {
         endsGameAs: "escaped",
         requiresFlag: "canEscape",
         lockedText:
-          "The door is bolted with a mechanism you don't understand — three sockets shaped like coins, and a keypad gone dark for lack of power. It will not open like this.",
+          "The door is bolted with a mechanism you don't understand - three sockets shaped like coins, and a keypad gone dark for lack of power. It will not open like this.",
         noise: "medium",
       },
     ],
@@ -65,14 +68,14 @@ export const ROOMS: Record<string, RoomDef> = {
         id: "chandelier",
         name: "Examine the Chandelier",
         examineText:
-          "Wrought iron, cobwebbed, its candles long burned to stubs. You get the feeling it hasn't been lit in a very long time — or that something prefers it that way.",
+          "Wrought iron, cobwebbed, its candles long burned to stubs. You get the feeling it hasn't been lit in a very long time - or that something prefers it that way.",
         noise: "none",
       },
       {
         id: "doorMechanism",
         name: "Examine the Door Mechanism",
         examineText: [
-          "Three round sockets are set into the door, each shaped like a coin with strange engravings worn into their rims — moon, sun, vine. Beside them, a small keypad, screen dark.",
+          "Three round sockets are set into the door, each shaped like a coin with strange engravings worn into their rims - moon, sun, vine. Beside them, a small keypad, screen dark.",
           "The three sockets are still empty. The keypad is still dark.",
         ],
         noise: "none",
@@ -86,7 +89,7 @@ export const ROOMS: Record<string, RoomDef> = {
           "You need all three ward sigils, and the house needs its power back, before this door will listen to you.",
         setsFlag: "canEscape",
         resolveText:
-          "The three sigils click into their sockets and the keypad flickers to life, then goes green. Somewhere behind you, deep in the house, something exhales — a long, disappointed breath. The bolts retract, one, two, three.",
+          "The three sigils click into their sockets and the keypad flickers to life, then goes green. Somewhere behind you, deep in the house, something exhales - a long, disappointed breath. The bolts retract, one, two, three.",
         noise: "medium",
       },
       {
@@ -97,7 +100,7 @@ export const ROOMS: Record<string, RoomDef> = {
         requiresFlag: "loreComplete",
         endsGameAs: "banished",
         resolveText:
-          "The house goes utterly silent — no pipes, no wind, no breathing but your own. Then, very softly, something says it back to you.",
+          "The house goes utterly silent - no pipes, no wind, no breathing but your own. Then, very softly, something says it back to you.",
         noise: "medium",
       },
     ],
@@ -194,13 +197,13 @@ export const ROOMS: Record<string, RoomDef> = {
         id: "bookshelf",
         name: "Open the Loose Shelf",
         examineText:
-          "This shelf isn't flush with the wall. There's a seam behind it, like a door — but it won't move.",
+          "This shelf isn't flush with the wall. There's a seam behind it, like a door - but it won't move.",
         requiresFlag: "bothPagesRead",
         lockedText:
-          "You need something more before this will open — the two torn journal pages, read together, feel like they're missing something. Perhaps there's a second page somewhere in the house.",
+          "You need something more before this will open - the two torn journal pages, read together, feel like they're missing something. Perhaps there's a second page somewhere in the house.",
         setsFlag: "bookshelfOpen",
         resolveText:
-          "Both pages, read together, name a date — and somehow the shelf knows it too. It grinds aside, revealing a small stone alcove, and inside it, a disc of tarnished silver.",
+          "Both pages, read together, name a date - and somehow the shelf knows it too. It grinds aside, revealing a small stone alcove, and inside it, a disc of tarnished silver.",
         noise: "high",
       },
       {
@@ -242,7 +245,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: "table",
         name: "Examine the Table Setting",
         examineText:
-          "Fine china, tarnished silver, all laid out and thick with dust — except one setting, which is spotless, as if used recently. Or often.",
+          "Fine china, tarnished silver, all laid out and thick with dust - except one setting, which is spotless, as if used recently. Or often.",
         sanityOnFirstExamine: -2,
         noise: "none",
       },
@@ -417,7 +420,7 @@ export const ROOMS: Record<string, RoomDef> = {
         id: "workbench",
         name: "Search the Workbench",
         examineText:
-          "Tools, rust, and — half-buried under a rag — a fat copper fuse.",
+          "Tools, rust, and - half-buried under a rag - a fat copper fuse.",
         requiresItem: "matches",
         lockedText:
           "It's too dark in this corner to make anything out. You need a light.",
@@ -448,7 +451,7 @@ export const ROOMS: Record<string, RoomDef> = {
           "It's too dark in this corner to make anything out. You need a light.",
         givesItem: "sigilVine",
         resolveText:
-          "You work loose a disc of green-black bronze — the Vine sigil.",
+          "You work loose a disc of green-black bronze - the Vine sigil.",
         afterText: "Empty bottles, nothing more.",
         noise: "low",
       },
@@ -477,6 +480,14 @@ export const ROOMS: Record<string, RoomDef> = {
       "Dust, slanted beams, a sliver of grey window-light, and a bound trunk.",
     exits: [
       { to: "hallway", label: "Go back down to the Hallway", noise: "low" },
+      {
+        to: "crawlspace",
+        label: "Squeeze Into the Crawlspace",
+        requiresFlag: "eaveOpen",
+        lockedText:
+          "There's nothing there. Or there wasn't, until you knew where to look.",
+        noise: "low",
+      },
     ],
     hotspots: [
       {
@@ -501,6 +512,46 @@ export const ROOMS: Record<string, RoomDef> = {
         resolveText:
           "You take the Sun sigil. The child's shoe you leave exactly where it is.",
         sanityOnFirstExamine: -5,
+        noise: "low",
+      },
+      {
+        id: "eave",
+        name: "Search the Low Eave",
+        examineText:
+          "The roofline slopes low here, barely a crawlspace, and it's black-dark under it. You'd need a light to see anything back there.",
+        requiresItem: "matches",
+        lockedText: "It's pitch black back there. You'd need a light.",
+        setsFlag: "eaveOpen",
+        resolveText:
+          "By match-light, you can see the crawlspace goes back further than the eave should reasonably allow. Something about the angle is wrong.",
+        noise: "low",
+      },
+    ],
+  },
+
+  crawlspace: {
+    id: "crawlspace",
+    name: "The Crawlspace",
+    palette: "void",
+    dangerLevel: 3,
+    firstVisitText:
+      "You go in on your hands and knees. The space is smaller than it looked from the Attic, and colder, and it smells like a well. Somewhere ahead of you, cloth rustles against wood - or you rustled it yourself. You're not entirely sure anymore.",
+    description:
+      "A cramped, low crawlspace under the eave. There's nowhere to stand, and nowhere to go but back the way you came.",
+    exits: [
+      { to: "attic", label: "Squeeze Back Into the Attic", noise: "low" },
+    ],
+    hotspots: [
+      {
+        id: "bundle",
+        name: "Unwrap the Cloth Bundle",
+        examineText:
+          "A bundle of oilcloth, tied with twine gone stiff with age, tucked into the furthest corner you can reach.",
+        givesItem: "fadedPhotograph",
+        resolveText:
+          "Inside: a single photograph, and nothing else. You're glad, obscurely, that there was nothing else.",
+        afterText: "Empty oilcloth, and the twine you cut through it.",
+        sanityOnFirstExamine: -6,
         noise: "low",
       },
     ],
