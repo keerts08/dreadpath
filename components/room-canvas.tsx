@@ -52,7 +52,7 @@ interface Props {
   entityDistance: number;
   keysDown: RefObject<Set<string>>;
   onInteractHotspot: (hotspot: HotspotDef) => void;
-  onToggleHide: (hotspot: HotspotDef) => void;
+  onToggleHide: () => void;
   onUseExit: (exit: ExitDef) => void;
   onRunNoise: () => void;
   onCaught: () => void;
@@ -151,9 +151,13 @@ export default function RoomCanvas({
       if (k === "e") {
         e.preventDefault();
         if (latest.current.paused) return;
+        if (latest.current.isHidden) {
+          latest.current.onToggleHide();
+          return;
+        }
         const h = nearbyHotspot.current;
         if (h) {
-          if (h.isHideSpot) latest.current.onToggleHide(h);
+          if (h.isHideSpot) latest.current.onToggleHide();
           else latest.current.onInteractHotspot(h);
         }
       }

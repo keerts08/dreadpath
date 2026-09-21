@@ -19,9 +19,23 @@ import { ExitDef, HotspotDef, Vec2 } from "@/game/types";
 import ActionLog from "@/components/action-log";
 import AmbientAudioEngine from "@/components/audio-engine";
 import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { AnimatePresence, motion } from "motion/react";
 
 const AMBIENT_TICK_MS = 4200;
+
+const PAUSE_BUTTON =
+  "w-full rounded-none border-line bg-transparent py-2 text-sm tracking-widest shadow-none h-auto hover:border-amber hover:text-amber";
+const HEADER_BUTTON =
+  "rounded-none border-line bg-transparent text-xs tracking-widest text-ink-dim shadow-none h-auto px-3 py-1 hover:border-amber hover:text-amber";
 
 export default function GameShell() {
   const hydrated = useHydrated();
@@ -29,6 +43,7 @@ export default function GameShell() {
   const [scareShown, setScareShown] = useState(false);
   const [doorSpawn, setDoorSpawn] = useState<Vec2 | null>(null);
   const [paused, setPaused] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const started = useGameStore((s) => s.started);
   const ending = useGameStore((s) => s.ending);
@@ -54,7 +69,7 @@ export default function GameShell() {
   const pulseNoise = useGameStore((s) => s.pulseNoise);
   const capture = useGameStore((s) => s.capture);
   const toggleAudio = useGameStore((s) => s.toggleAudio);
-  const toggleVolume = useGameStore((s) => s.setVolume);
+  const setVolume = useGameStore((s) => s.setVolume);
   const toggleReduceMotion = useGameStore((s) => s.toggleReduceMotion);
   const newGame = useGameStore((s) => s.newGame);
 
@@ -142,30 +157,121 @@ export default function GameShell() {
 
       <AmbientAudioEngine />
 
-      {paused && !ending && (
-        <div className="fixed inset-0 z-[92] bg-black/90 flex items-center justify-center p-6">
-          <div className="max-w-sm w-full text-center space-y-6">
-            <h2 className="font-display text-2xl tracking-widest text-bone">
+      <Dialog open={paused && !ending} onOpenChange={setPaused}>
+        <DialogContent
+          showCloseButton={false}
+          className="max-w-sm rounded-none bg-panel text-center text-ink-dim ring-line"
+        >
+          <DialogHeader>
+            <DialogTitle className="font-display text-2xl tracking-widest text-bone">
               PAUSED
-            </h2>
-            <p className="text-xs text-ink-faint">The house waits too.</p>
-            <div className="space-y-3">
+            </DialogTitle>
+            <DialogDescription className="text-xs text-ink-faint">
+              The house waits too.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Button
+              onClick={() => setPaused(false)}
+              variant="outline"
+              className={PAUSE_BUTTON}
+            >
+              RESUME
+            </Button>
+            <Button
+              onClick={() => setSettingsOpen(true)}
+              variant="outline"
+              className={PAUSE_BUTTON}
+            >
+              SETTINGS
+            </Button>
+            <Button
+              onClick={() => router.push("/")}
+              variant="outline"
+              className={PAUSE_BUTTON}
+            >
+              QUIT TO MENU
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <DialogContent
+          showCloseButton={false}
+          className="max-w-sm rounded-none bg-panel text-ink-dim ring-line"
+        >
+          <DialogHeader>
+            <DialogTitle className="font-display text-base text-bone tracking-widest">
+              SETTINGS
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Sound and accessibility settings
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-5">
+            <div className="flex items-center justify-between text-sm">
+              <span>SOUND</span>
               <Button
-                onClick={() => setPaused(false)}
-                className="w-full border border-line px-6 py-3 text-sm tracking-widest hover:border-amber hover:text-amber transition-colors"
+                onClick={toggleAudio}
+                variant="outline"
+                size="sm"
+                className={`h-auto rounded-none bg-transparent px-3 py-1 shadow-none ${
+                  audioEnabled
+                    ? "border-amber text-amber"
+                    : "border-line text-ink-dim"
+                }`}
               >
-                RESUME
-              </Button>
-              <Button
-                onClick={() => router.push("/")}
-                className="w-full border border-line px-6 py-3 text-sm tracking-widest text-ink-dim hover:border-ink-dim hover:text-ink transition-colors"
-              >
-                QUIT TO MENU
+                {audioEnabled ? "ON" : "OFF"}
               </Button>
             </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-[11px] tracking-widest text-ink-faint">
+                <span>VOLUME</span>
+                <span className="text-ink tabular-nums">
+                  {Math.round(volume * 100)}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min={0}
+                max={1}
+                step={0.05}
+                value={volume}
+                onChange={(e) => setVolume(Number(e.target.value))}
+                disabled={!audioEnabled}
+                className="w-full accent-amber"
+                aria-label="Volume"
+              />
+            </div>
+
+            <label className="flex items-center gap-2 text-[11px] tracking-widest text-ink-faint">
+              <input
+                type="checkbox"
+                checked={reduceMotion}
+                onChange={toggleReduceMotion}
+                className="accent-amber"
+              />
+              REDUCE SCREEN SHAKE
+            </label>
           </div>
-        </div>
-      )}
+
+          <DialogFooter>
+            <DialogClose
+              render={
+                <Button
+                  variant="outline"
+                  className="h-auto rounded-none border-line bg-transparent px-4 py-2 text-xs tracking-widest shadow-none hover:border-amber hover:text-amber"
+                >
+                  CLOSE
+                </Button>
+              }
+            />
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <CorruptionWrapper
         band={band}
@@ -180,18 +286,20 @@ export default function GameShell() {
             <div className="flex items-center gap-2">
               <Button
                 onClick={() => setPaused(true)}
-                className="rounded-none border-line bg-transparent text-xs tracking-widest text-ink-dim shadow-none h-auto px-3 py-1 hover:border-amber hover:text-amber"
+                variant="outline"
+                className={HEADER_BUTTON}
               >
                 PAUSE
               </Button>
 
-              <Button className="rounded-none border-line bg-transparent text-xs tracking-widest text-ink-dim shadow-none h-auto px-3 py-1 hover:border-amber hover:text-amber">
+              <Button variant="outline" className={HEADER_BUTTON}>
                 HELP DIALOG HERE
               </Button>
 
               <Button
                 onClick={toggleAudio}
-                className="rounded-none border-line bg-transparent text-xs tracking-widest text-ink-dim shadow-none h-auto px-3 py-1 hover:border-amber hover:text-amber"
+                variant="outline"
+                className={HEADER_BUTTON}
               >
                 SOUND: {audioEnabled ? "ON" : "OFF"}
               </Button>

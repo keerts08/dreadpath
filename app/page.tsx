@@ -18,6 +18,9 @@ import { useGameStore } from "@/game/store";
 import { hasSaveGame, useHydrated } from "@/game/useHydrated";
 import { useRouter } from "next/navigation";
 
+const BUTTON =
+  "w-full rounded-none border-line bg-transparent py-3 text-sm tracking-widest shadow-none h-auto";
+
 export default function Home() {
   const router = useRouter();
   const hydrated = useHydrated();
@@ -57,8 +60,8 @@ export default function Home() {
           <div className="space-y-3">
             <Button
               onClick={() => begin(true)}
-             
-              className="w-full border-line py-3 text-sm tracking-widest hover:border-amber hover:text-amber"
+              variant="outline"
+              className={`${BUTTON} hover:border-amber hover:text-amber`}
             >
               PLAY
             </Button>
@@ -66,8 +69,8 @@ export default function Home() {
             {canContinue && (
               <Button
                 onClick={() => begin(false)}
-              
-                className="w-full border-line py-3 text-sm tracking-widest hover:border-amber hover:text-amber"
+                variant="outline"
+                className={`${BUTTON} hover:border-amber hover:text-amber`}
               >
                 CONTINUE
               </Button>
@@ -75,7 +78,8 @@ export default function Home() {
 
             <Button
               onClick={() => setSettingsOpen(true)}
-              className="w-full border-line py-3 text-sm tracking-widest text-ink-dim hover:border-ink-dim hover:text-ink"
+              variant="outline"
+              className={`${BUTTON} text-ink-dim hover:border-ink-dim hover:text-ink`}
             >
               SETTINGS
             </Button>
@@ -84,7 +88,8 @@ export default function Home() {
               <DialogTrigger
                 render={
                   <Button
-                    className="w-full border-line py-3 text-sm tracking-widest text-ink-dim hover:border-ink-dim hover:text-ink"
+                    variant="outline"
+                    className={`${BUTTON} text-ink-dim hover:border-ink-dim hover:text-ink`}
                   >
                     HOW TO PLAY
                   </Button>
@@ -92,7 +97,7 @@ export default function Home() {
               />
               <DialogContent
                 showCloseButton={false}
-                className="max-w-md bg-panel text-ink-dim ring-line"
+                className="max-w-md rounded-none bg-panel text-ink-dim ring-line"
               >
                 <DialogHeader>
                   <DialogTitle className="font-display text-base text-bone tracking-widest">
@@ -129,7 +134,7 @@ export default function Home() {
                     render={
                       <Button
                         variant="outline"
-                        className="text-xs tracking-widest hover:border-amber hover:text-amber"
+                        className="h-auto rounded-none border-line bg-transparent px-4 py-2 text-xs tracking-widest shadow-none hover:border-amber hover:text-amber"
                       >
                         CLOSE
                       </Button>
@@ -142,7 +147,7 @@ export default function Home() {
             <Dialog open={settingsOpen} onOpenChange={setSettingsOpen}>
               <DialogContent
                 showCloseButton={false}
-                className="max-w-sm bg-panel text-ink-dim ring-line"
+                className="max-w-sm rounded-none bg-panel text-ink-dim ring-line"
               >
                 <DialogHeader>
                   <DialogTitle className="font-display text-base text-bone tracking-widest">
@@ -160,11 +165,11 @@ export default function Home() {
                       onClick={toggleAudio}
                       variant="outline"
                       size="sm"
-                      className={
+                      className={`h-auto rounded-none bg-transparent px-3 py-1 shadow-none ${
                         audioEnabled
                           ? "border-amber text-amber"
                           : "border-line text-ink-dim"
-                      }
+                      }`}
                     >
                       {audioEnabled ? "ON" : "OFF"}
                     </Button>
@@ -206,7 +211,7 @@ export default function Home() {
                     render={
                       <Button
                         variant="outline"
-                        className="text-xs tracking-widest hover:border-amber hover:text-amber"
+                        className="h-auto rounded-none border-line bg-transparent px-4 py-2 text-xs tracking-widest shadow-none hover:border-amber hover:text-amber"
                       >
                         CLOSE
                       </Button>
