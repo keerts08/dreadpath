@@ -42,6 +42,7 @@ export default function GameShell() {
   const router = useRouter();
   const [scareShown, setScareShown] = useState(false);
   const [doorSpawn, setDoorSpawn] = useState<Vec2 | null>(null);
+  const [helpOpen, setHelpOpen] = useState(false)
   const [paused, setPaused] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
@@ -126,7 +127,7 @@ export default function GameShell() {
 
   if (!hydrated) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-ink-dim text-sm tracking-widest">
+      <div className="min-h-dvh flex items-center justify-center text-ink-dim text-sm tracking-widest">
         LOADING...
       </div>
     );
@@ -146,9 +147,14 @@ export default function GameShell() {
   const showEnding = ending && (ending !== "caught" || scareShown);
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-dvh small-touch:landscape:h-dvh small-touch:landscape:overflow-hidden">
       <Layer />
-      {showJumpscare && <JumpscareOverlay onDone={() => setScareShown(true)} reduceMotion={reduceMotion} />}
+      {showJumpscare && (
+        <JumpscareOverlay
+          onDone={() => setScareShown(true)}
+          reduceMotion={reduceMotion}
+        />
+      )}
       {showEnding && (
         <EndingScreen
           ending={ending}
@@ -311,10 +317,10 @@ export default function GameShell() {
             </div>
           </header>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_240px] gap-3 items-start">
-            <div className="order-2 lg:order-1 space-y-3">
+          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_240px] gap-3 items-start small-touch:landscape:grid-cols-[120px_1fr_120px] small-touch:landscape:gap-2 small-touch:landscape:min-h-0 small-touch:landscape:flex-1 small-touch:landscape:items-stretch">
+            <div className="order-2 lg:order-1 space-y-3 small-touch:landscape:order-1 small-touch:landscape:h-full small-touch:landscape:overflow-y-auto small-touch:landscape:space-y-1.5">
               <MapPanel currentRoom={currentRoom} visitedRooms={visitedRooms} />
-              <div className="border border-line bg-panel/60 p-3 space-y-3">
+              <div className="border border-line bg-panel/60 p-3 space-y-3 small-touch:landscape:p-2 small-touch:landscape:space-y-2">
                 <StatusHUD
                   sanity={sanity}
                   band={band}
@@ -323,8 +329,7 @@ export default function GameShell() {
                 />
               </div>
             </div>
-
-            <div className="order-1 lg:order-2 space-y-3">
+            <div className="order-1 lg:order-2 space-y-3 small-touch:landscape:order-2 small-touch:landscape:h-full small-touch:landscape:flex small-touch:landscape:flex-col small-touch:landscape:space-y-1.5 small-touch:landscape:min-h-0">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentRoom}
@@ -332,6 +337,7 @@ export default function GameShell() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.22, ease: "easeInOut" }}
+                  className="small-touch:landscape:min-h-0"
                 >
                   <RoomCanvas
                     room={room}
@@ -351,12 +357,12 @@ export default function GameShell() {
                   />
                 </motion.div>
               </AnimatePresence>
-              <p className="text-sm text-ink-dim italic leading-relaxed">
+              <p className="text-sm text-ink-dim italic leading-relaxed small-touch:landscape:hidden">
                 {room.description}
               </p>
               <ActionLog entries={log} />
             </div>
-            <div className="order-3 space-y-3">
+            <div className="order-3 space-y-3 small-touch:landscape:order-3 small-touch:landscape:h-full small-touch:landscape:overflow-y-auto">
               <Inventory items={inventory} />
             </div>
           </div>

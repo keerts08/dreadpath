@@ -1,6 +1,6 @@
 "use client";
 
-import { RefObject, useEffect, useRef } from "react";
+import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 import { ExitDef, HotspotDef, RoomDef, RoomLayout, Vec2 } from "@/game/types";
 import {
   clamp,
@@ -11,6 +11,7 @@ import {
 } from "@/game/physics";
 import { houseAudio } from "@/game/audio";
 import { drawHotspotIcon } from "./furniture-art";
+import TouchControls from "./touch-controls";
 
 const WALK_SPEED = 190;
 const RUN_SPEED = 340;
@@ -57,7 +58,7 @@ interface Props {
   entityDistance: number;
   keysDown: RefObject<Set<string>>;
   onInteractHotspot: (hotspot: HotspotDef) => void;
-  onToggleHide: () => void;
+  onToggleHide: (hotspot: HotspotDef) => void;
   onUseExit: (exit: ExitDef) => void;
   onRunNoise: () => void;
   onCaught: () => void;
@@ -95,6 +96,8 @@ export default function RoomCanvas({
   const lastFootstepAt = useRef(0);
   const lastFrameAt = useRef<number | null>(null);
   const rafId = useRef<number | null>(null);
+
+  const [running, setRunning] = useState(false);
 
   const latest = useRef({
     room,
@@ -134,6 +137,23 @@ export default function RoomCanvas({
     wasHidden.current = isHidden;
   }, [isHidden]);
 
+  const triggerInteract = useCallback(() => {
+    if (latest.current.paused) return;
+    const h = nearbyHotspot.current;
+    if (!h) return;
+    if (h.isHideSpot) latest.current.onToggleHide(h);
+    else latest.current.onInteractHotspot(h);
+  }, []);
+
+  const handleRunToggle = () => {
+    setRunning((r) => {
+      const next = !r;
+      if (next) keysDown.current.add("shift");
+      else keysDown.current.delete("shift");
+      return next;
+    });
+  };
+
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       const k = e.key.toLowerCase();
@@ -155,16 +175,7 @@ export default function RoomCanvas({
       }
       if (k === "e") {
         e.preventDefault();
-        if (latest.current.paused) return;
-        if (latest.current.isHidden) {
-          latest.current.onToggleHide();
-          return;
-        }
-        const h = nearbyHotspot.current;
-        if (h) {
-          if (h.isHideSpot) latest.current.onToggleHide();
-          else latest.current.onInteractHotspot(h);
-        }
+        triggerInteract();
       }
     };
     const up = (e: KeyboardEvent) => {
@@ -176,7 +187,7 @@ export default function RoomCanvas({
       window.removeEventListener("keydown", down);
       window.removeEventListener("keyup", up);
     };
-  }, [keysDown]);
+  }, [keysDown, triggerInteract]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -350,6 +361,13 @@ export default function RoomCanvas({
         width={layout.width}
         height={layout.height}
         className="w-full h-full block"
+      />
+      <TouchControls
+        running={running}
+        onDirDown={(k) => keysDown.current.add(k)}
+        onDirUp={(k) => keysDown.current.delete(k)}
+        onInteract={triggerInteract}
+        onRunToggle={handleRunToggle}
       />
     </div>
   );
