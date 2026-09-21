@@ -118,6 +118,12 @@ export default function GameShell() {
   const handleRunNoise = useCallback(() => pulseNoise("low"), [pulseNoise]);
   const handleCaught = useCallback(() => capture(), [capture]);
 
+  useEffect(() => {
+    if (!started) {
+      router.replace("/")
+    }
+  }, [started, router])
+
   if (!hydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center text-ink-dim text-sm tracking-widest">
