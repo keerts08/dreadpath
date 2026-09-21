@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 
 @custom-variant dark (&:is(.dark *));
+@custom-variant small-touch (@media (pointer: coarse) and (max-width: 900px));
 
 :root {
   --bg-void: #07080a;
