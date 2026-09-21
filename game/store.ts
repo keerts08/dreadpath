@@ -350,7 +350,7 @@ export const useGameStore = create<Store>()(
         finishGame(set, get, "caught");
       },
     }),
-    { name: "blackwell-manor-save" },
+    { name: "ravenshade-manor-save" },
   ),
 );
 

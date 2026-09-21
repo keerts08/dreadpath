@@ -93,6 +93,7 @@ export default function Home() {
           <div className="space-y-3">
             <Button
               onClick={() => begin(true)}
+              variant="outline"
               className={`${BUTTON} hover:border-amber hover:text-amber`}
             >
               PLAY
@@ -101,6 +102,7 @@ export default function Home() {
             {canContinue && (
               <Button
                 onClick={() => begin(false)}
+                variant="outline"
                 className={`${BUTTON} hover:border-amber hover:text-amber`}
               >
                 CONTINUE
