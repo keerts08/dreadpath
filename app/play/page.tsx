@@ -10,6 +10,7 @@ import Layer from "@/components/layer";
 import JumpscareOverlay from "@/components/jumpscare";
 import EndingScreen from "@/components/ending-screen";
 import CorruptionWrapper from "@/components/corruption-wrapper";
+import RotatePrompt from "@/components/rotate-prompt";
 import { tensionBand } from "@/game/entity";
 import MapPanel from "@/components/map-panel";
 import StatusHUD from "@/components/status-hud";
@@ -36,15 +37,76 @@ const PAUSE_BUTTON =
   "w-full rounded-none border-line bg-transparent py-2 text-sm tracking-widest shadow-none h-auto hover:border-amber hover:text-amber";
 const HEADER_BUTTON =
   "rounded-none border-line bg-transparent text-xs tracking-widest text-ink-dim shadow-none h-auto px-3 py-1 hover:border-amber hover:text-amber";
+const MOBILE_ICON_BUTTON =
+  "pointer-events-auto flex h-9 w-9 items-center justify-center border border-line bg-panel/70 text-ink-dim active:border-amber active:text-amber";
+type MobilePanel = "map" | "inventory" | "log" | "status" | null;
+
+function MapGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
+      <path d="M4 5 L9 3 L15 5 L20 3 V19 L15 21 L9 19 L4 21 Z" strokeLinejoin="round" />
+      <path d="M9 3 V19 M15 5 V21" strokeDasharray="2 2" />
+    </svg>
+  );
+}
+
+function BagGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
+      <path d="M7 8 V6 a5 5 0 0 1 10 0 v2" strokeLinecap="round" />
+      <rect x="4" y="8" width="16" height="13" rx="1.5" />
+    </svg>
+  );
+}
+
+function LogGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
+      <path d="M5 6 H19 M5 12 H19 M5 18 H13" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function PulseGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
+      <path d="M3 12 H8 L10 6 L14 18 L16 12 H21" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function PauseGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+      <rect x="6" y="4" width="4" height="16" />
+      <rect x="14" y="4" width="4" height="16" />
+    </svg>
+  );
+}
+
+function HelpGlyph() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.3 a2.5 2.5 0 1 1 3.5 2.3 c-1 0.5 -1 1.2 -1 2" strokeLinecap="round" />
+      <circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
 
 export default function GameShell() {
   const hydrated = useHydrated();
   const router = useRouter();
   const [scareShown, setScareShown] = useState(false);
   const [doorSpawn, setDoorSpawn] = useState<Vec2 | null>(null);
-  const [helpOpen, setHelpOpen] = useState(false)
+  const [helpOpen, setHelpOpen] = useState(false);
   const [paused, setPaused] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // Phone-landscape only: which docked panel (if any) is currently open
+  // over the game. Everything else — map, inventory, log, status — stays
+  // out of the way behind a small icon until tapped, so the canvas is what
+  // actually fills the screen instead of fighting three sidebars for room.
+  const [mobilePanel, setMobilePanel] = useState<MobilePanel>(null);
 
   const started = useGameStore((s) => s.started);
   const ending = useGameStore((s) => s.ending);
@@ -149,6 +211,7 @@ export default function GameShell() {
   return (
     <div className="min-h-dvh small-touch:landscape:h-dvh small-touch:landscape:overflow-hidden">
       <Layer />
+      <RotatePrompt />
       {showJumpscare && (
         <JumpscareOverlay
           onDone={() => setScareShown(true)}
@@ -167,6 +230,90 @@ export default function GameShell() {
       )}
 
       <AmbientAudioEngine />
+      <Dialog
+        open={mobilePanel !== null}
+        onOpenChange={(o) => !o && setMobilePanel(null)}
+      >
+        <DialogContent
+          showCloseButton
+          className="max-w-sm rounded-none bg-panel text-ink-dim ring-line"
+        >
+          <DialogHeader>
+            <DialogTitle className="font-display text-base text-bone tracking-widest">
+              {mobilePanel === "map" && "MAP"}
+              {mobilePanel === "inventory" && "POCKETS"}
+              {mobilePanel === "log" && "LOG"}
+              {mobilePanel === "status" && "STATUS"}
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              {mobilePanel} panel
+            </DialogDescription>
+          </DialogHeader>
+          {mobilePanel === "map" && (
+            <MapPanel
+              currentRoom={currentRoom}
+              visitedRooms={visitedRooms}
+              svgClassName="mx-auto aspect-square w-[min(100%,48dvh)]"
+            />
+          )}
+          {mobilePanel === "inventory" && <Inventory items={inventory} />}
+          {mobilePanel === "log" && <ActionLog entries={log} />}
+          {mobilePanel === "status" && (
+            <StatusHUD
+              sanity={sanity}
+              band={band}
+              isHidden={isHidden}
+              turn={turn}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={helpOpen} onOpenChange={setHelpOpen}>
+        <DialogContent
+          showCloseButton={false}
+          className="max-w-md rounded-none bg-panel text-ink-dim ring-line"
+        >
+          <DialogHeader>
+            <DialogTitle className="font-display text-base text-bone tracking-widest">
+              HOW THIS WORKS
+            </DialogTitle>
+            <DialogDescription className="sr-only">
+              Controls and mechanics
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 text-sm leading-relaxed">
+            <p>
+              Move with WASD or the arrow keys, or the on-screen stick on a
+              phone. Hold Shift — or tap RUN — to move faster, but louder.
+            </p>
+            <p>
+              Walk up to something and press E, or the on-screen E button, to
+              examine, take, or use it. Walking into a doorway moves you
+              through it.
+            </p>
+            <p>
+              Something else is in the house. Noise draws it closer, and in
+              the wrong room it may start pursuing you for real — you&rsquo;ll
+              see it coming. Find a hiding spot and interact with it to duck
+              inside if it gets close.
+            </p>
+            <p>
+              Your grip on things will fray the longer you stay, and faster
+              if you dwell on what you find. Read carefully.
+            </p>
+          </div>
+          <DialogFooter>
+            <Button
+              onClick={() => setHelpOpen(false)}
+              variant="outline"
+              className="h-auto rounded-none border-line bg-transparent px-4 py-2 text-xs tracking-widest shadow-none hover:border-amber hover:text-amber"
+            >
+              CLOSE
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={paused && !ending} onOpenChange={setPaused}>
         <DialogContent
@@ -289,8 +436,8 @@ export default function GameShell() {
         lowSanity={lowSanity}
         reduceMotion={reduceMotion}
       >
-        <div className="mx-auto max-w-6xl px-4 py-6 space-y-3">
-          <header className="flex items-center justify-between border-b border-line pb-2">
+        <div className="mx-auto max-w-6xl px-4 py-6 space-y-3 small-touch:landscape:flex small-touch:landscape:h-dvh small-touch:landscape:max-w-none small-touch:landscape:flex-col small-touch:landscape:space-y-0 small-touch:landscape:px-0 small-touch:landscape:py-0">
+          <header className="flex items-center justify-between border-b border-line pb-2 small-touch:landscape:hidden">
             <h1 className="font-display text-sm tracking-widest text-ink-dim">
               DREADPATH
             </h1>
@@ -303,8 +450,12 @@ export default function GameShell() {
                 PAUSE
               </Button>
 
-              <Button variant="outline" className={HEADER_BUTTON}>
-                HELP DIALOG HERE
+              <Button
+                onClick={() => setHelpOpen(true)}
+                variant="outline"
+                className={HEADER_BUTTON}
+              >
+                HELP
               </Button>
 
               <Button
@@ -317,10 +468,10 @@ export default function GameShell() {
             </div>
           </header>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_240px] gap-3 items-start small-touch:landscape:grid-cols-[120px_1fr_120px] small-touch:landscape:gap-2 small-touch:landscape:min-h-0 small-touch:landscape:flex-1 small-touch:landscape:items-stretch">
-            <div className="order-2 lg:order-1 space-y-3 small-touch:landscape:order-1 small-touch:landscape:h-full small-touch:landscape:overflow-y-auto small-touch:landscape:space-y-1.5">
+          <div className="grid grid-cols-1 lg:grid-cols-[220px_1fr_240px] gap-3 items-start small-touch:landscape:grid-cols-1 small-touch:landscape:flex-1 small-touch:landscape:items-stretch small-touch:landscape:gap-0 small-touch:landscape:min-h-0">
+            <div className="order-2 lg:order-1 space-y-3 small-touch:landscape:hidden">
               <MapPanel currentRoom={currentRoom} visitedRooms={visitedRooms} />
-              <div className="border border-line bg-panel/60 p-3 space-y-3 small-touch:landscape:p-2 small-touch:landscape:space-y-2">
+              <div className="border border-line bg-panel/60 p-3 space-y-3">
                 <StatusHUD
                   sanity={sanity}
                   band={band}
@@ -329,40 +480,98 @@ export default function GameShell() {
                 />
               </div>
             </div>
-            <div className="order-1 lg:order-2 space-y-3 small-touch:landscape:order-2 small-touch:landscape:h-full small-touch:landscape:flex small-touch:landscape:flex-col small-touch:landscape:space-y-1.5 small-touch:landscape:min-h-0">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={currentRoom}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0 }}
-                  transition={{ duration: 0.22, ease: "easeInOut" }}
-                  className="small-touch:landscape:min-h-0"
+            <div className="order-1 lg:order-2 space-y-3 small-touch:landscape:flex small-touch:landscape:h-full small-touch:landscape:flex-row small-touch:landscape:items-stretch small-touch:landscape:space-y-0 small-touch:landscape:gap-1 small-touch:landscape:min-h-0">
+              <div className="hidden small-touch:landscape:flex small-touch:landscape:w-9 small-touch:landscape:shrink-0 small-touch:landscape:flex-col small-touch:landscape:items-center small-touch:landscape:justify-center small-touch:landscape:gap-1.5">
+                <button
+                  type="button"
+                  aria-label="Status"
+                  onClick={() => setMobilePanel("status")}
+                  className={`${MOBILE_ICON_BUTTON} ${lowSanity || isHidden ? "border-amber text-amber" : ""}`}
                 >
-                  <RoomCanvas
-                    room={room}
-                    layout={layout}
-                    spawn={spawnPoint}
-                    flags={flags}
-                    resolvedHotspots={resolvedHotspots}
-                    isHidden={isHidden}
-                    paused={paused}
-                    entityDistance={entity.distance}
-                    keysDown={keysDown}
-                    onInteractHotspot={handleInteract}
-                    onToggleHide={handleToggleHide}
-                    onUseExit={handleUseExit}
-                    onRunNoise={handleRunNoise}
-                    onCaught={handleCaught}
-                  />
-                </motion.div>
-              </AnimatePresence>
-              <p className="text-sm text-ink-dim italic leading-relaxed small-touch:landscape:hidden">
-                {room.description}
-              </p>
-              <ActionLog entries={log} />
+                  <PulseGlyph />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Map"
+                  onClick={() => setMobilePanel("map")}
+                  className={MOBILE_ICON_BUTTON}
+                >
+                  <MapGlyph />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Inventory"
+                  onClick={() => setMobilePanel("inventory")}
+                  className={MOBILE_ICON_BUTTON}
+                >
+                  <BagGlyph />
+                </button>
+              </div>
+
+              <div className="min-w-0 flex-1 small-touch:landscape:flex small-touch:landscape:h-full small-touch:landscape:items-center small-touch:landscape:justify-center">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentRoom}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.22, ease: "easeInOut" }}
+                    className="w-full small-touch:landscape:flex small-touch:landscape:h-full small-touch:landscape:min-h-0 small-touch:landscape:items-center small-touch:landscape:justify-center"
+                  >
+                    <RoomCanvas
+                      room={room}
+                      layout={layout}
+                      spawn={spawnPoint}
+                      flags={flags}
+                      resolvedHotspots={resolvedHotspots}
+                      isHidden={isHidden}
+                      paused={paused}
+                      entityDistance={entity.distance}
+                      keysDown={keysDown}
+                      onInteractHotspot={handleInteract}
+                      onToggleHide={handleToggleHide}
+                      onUseExit={handleUseExit}
+                      onRunNoise={handleRunNoise}
+                      onCaught={handleCaught}
+                    />
+                  </motion.div>
+                </AnimatePresence>
+                <p className="text-sm text-ink-dim italic leading-relaxed small-touch:landscape:hidden">
+                  {room.description}
+                </p>
+                <div className="small-touch:landscape:hidden">
+                  <ActionLog entries={log} />
+                </div>
+              </div>
+
+              <div className="hidden small-touch:landscape:flex small-touch:landscape:w-9 small-touch:landscape:shrink-0 small-touch:landscape:flex-col small-touch:landscape:items-center small-touch:landscape:justify-center small-touch:landscape:gap-1.5">
+                <button
+                  type="button"
+                  aria-label="Log"
+                  onClick={() => setMobilePanel("log")}
+                  className={MOBILE_ICON_BUTTON}
+                >
+                  <LogGlyph />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Help"
+                  onClick={() => setHelpOpen(true)}
+                  className={MOBILE_ICON_BUTTON}
+                >
+                  <HelpGlyph />
+                </button>
+                <button
+                  type="button"
+                  aria-label="Pause"
+                  onClick={() => setPaused(true)}
+                  className={MOBILE_ICON_BUTTON}
+                >
+                  <PauseGlyph />
+                </button>
+              </div>
             </div>
-            <div className="order-3 space-y-3 small-touch:landscape:order-3 small-touch:landscape:h-full small-touch:landscape:overflow-y-auto">
+            <div className="order-3 space-y-3 small-touch:landscape:hidden">
               <Inventory items={inventory} />
             </div>
           </div>

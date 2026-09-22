@@ -31,7 +31,7 @@ const ALL_ENDINGS: Exclude<Ending, null>[] = [
 ];
 
 const BUTTON =
-  "w-full rounded-none border-line bg-transparent py-3 text-sm tracking-widest shadow-none h-auto";
+  "w-full rounded-none border-line bg-transparent py-3 small-touch:landscape:py-1.5 text-sm tracking-widest shadow-none h-auto";
 
 export default function Home() {
   const router = useRouter();
@@ -60,11 +60,11 @@ export default function Home() {
 
   return (
     <HomeLayout>
-      <div className="min-h-screen flex items-center justify-center px-4">
+      <div className="min-h-screen flex items-center justify-center px-4 small-touch:landscape:min-h-0 small-touch:landscape:py-3">
         <Layer showRec={false} />
-        <div className="relative z-10 max-w-sm w-full text-center space-y-8 py-16 bg-void/50 rounded-xl px-4">
+        <div className="relative z-10 max-w-sm w-full text-center space-y-8 py-16 bg-void/50 rounded-xl px-4 small-touch:landscape:space-y-3 small-touch:landscape:py-4">
           <div className="space-y-2">
-            <h1 className="font-display text-4xl sm:text-5xl text-bone">
+            <h1 className="font-display text-4xl sm:text-5xl text-bone small-touch:landscape:text-2xl">
               DREADPATH
             </h1>
             <p className="text-xs tracking-widest text-ink-faint caret">
@@ -78,7 +78,7 @@ export default function Home() {
                 <Button
                   key={d}
                   onClick={() => setDifficulty(d)}
-                  className={`flex-1 border px-3 py-2 text-xs tracking-widest uppercase transition-colors ${
+                  className={`flex-1 border px-3 py-2 small-touch:landscape:py-1 text-xs tracking-widest uppercase transition-colors ${
                     difficulty === d
                       ? "border-amber text-amber"
                       : "border-line text-ink-dim hover:border-ink-dim hover:text-ink"
@@ -90,7 +90,7 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 small-touch:landscape:space-y-1.5">
             <Button
               onClick={() => begin(true)}
               variant="outline"

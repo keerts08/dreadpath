@@ -46,9 +46,11 @@ function bridgeRect(a: RoomId, b: RoomId) {
 export default function MapPanel({
   currentRoom,
   visitedRooms,
+  svgClassName = "h-36",
 }: {
   currentRoom: RoomId;
   visitedRooms: RoomId[];
+  svgClassName?: string;
 }) {
   const [zoom, setZoom] = useState(1.1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
@@ -130,7 +132,7 @@ export default function MapPanel({
       <svg
         ref={svgRef}
         viewBox={viewBox}
-        className="w-full h-36 overflow-hidden cursor-grab active:cursor-grabbing touch-none"
+        className={`w-full ${svgClassName} overflow-hidden cursor-grab active:cursor-grabbing touch-none`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={endDrag}

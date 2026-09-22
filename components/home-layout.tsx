@@ -11,7 +11,7 @@ export default function HomeLayout({ children }: { children: ReactNode }) {
         <NoiseBackground />
       </div>
       <div className="relative h-screen w-full overflow-auto">
-        <div className="relative w-full h-screen overflow-hidden">
+        <div className="relative w-full h-screen overflow-hidden small-touch:landscape:overflow-y-auto">
           <div className="absolute inset-0 z-0">
             <Image
               src="/blurhouse.png"

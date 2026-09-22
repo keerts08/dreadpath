@@ -353,7 +353,7 @@ export default function RoomCanvas({
 
   return (
     <div
-      className="relative w-full border border-line overflow-hidden bg-black"
+      className="relative w-full small-touch:landscape:h-full small-touch:landscape:w-auto small-touch:landscape:max-w-full border border-line overflow-hidden bg-black"
       style={{ aspectRatio: `${layout.width} / ${layout.height}` }}
     >
       <canvas
