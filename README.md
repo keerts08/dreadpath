@@ -7,7 +7,7 @@ Built with Next.js, Typescript and the Web Audio API
 [Play it](https://dreadpath.netlify.app)
 
 ### what it actually does:
-- top-down 2d house, ten rooms, real collision so furniture actually blocks you.
+- top-down 2d house, eleven rooms, real collision so furniture actually blocks you.
 - darkness - you can only see sm radius around you, rest of the room is black
 - an entity that reacts to sound and light, not a fixed patrol path. 
 - hiding spots, but the entity can still find you if you push you luck.

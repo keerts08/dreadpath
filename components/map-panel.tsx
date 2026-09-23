@@ -22,11 +22,11 @@ const BASE_LABEL_SIZE = 7.6;
 const LABEL_LINE_HEIGHT = 8;
 
 function estLabelWidth(s: string) {
-  return s.length * 0.6 * BASE_LABEL_SIZE + Math.max(0, s.length - 1) * 0.2;
+  return s.length * 4.9;
 }
 
 function wrapLabel(label: string): string[] {
-  const maxWidth = UNIT - 4;
+  const maxWidth = CELL - 4;
   if (estLabelWidth(label) <= maxWidth) return [label];
   const words = label.split(" ");
   if (words.length < 2) return [label];
