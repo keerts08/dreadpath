@@ -96,8 +96,8 @@ export default function JumpscareOverlay({
       document.body.classList.add("shake");
     }
 
-    if (typeof navigator !== "undefined" && navigator.vibrate ) {
-      navigator.vibrate([80, 40, 160])
+    if (typeof navigator !== "undefined" && navigator.vibrate) {
+      navigator.vibrate([80, 40, 160]);
     }
 
     const shakeId = setTimeout(() => {

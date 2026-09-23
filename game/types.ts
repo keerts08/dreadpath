@@ -32,12 +32,7 @@ export type Ending = "escaped" | "banished" | "caught" | "madness" | null;
 export type Difficulty = "easy" | "normal" | "hard";
 
 export type LogTone =
-  | "narration"
-  | "system"
-  | "dread"
-  | "whisper"
-  | "item"
-  | "hallucination";
+  "narration" | "system" | "dread" | "whisper" | "item" | "hallucination";
 
 export interface LogEntry {
   id: string;

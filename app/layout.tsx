@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cinzel, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
+import RegisterServiceWorker from "@/components/register-sw";
 
 const display = Cinzel({
   variable: "--font-display",
@@ -32,7 +33,10 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" className={`${display.variable} ${body.variable} h-full`}>
-      <body className="min-h-full bg-void text-ink">{children}</body>
+      <body className="min-h-full bg-void text-ink">
+        <RegisterServiceWorker />
+        {children}
+      </body>
     </html>
   );
 }

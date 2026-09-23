@@ -37,12 +37,12 @@ function wrapLabel(label: string): string[] {
     if (estLabelWidth(c) <= maxWidth) {
       current = c;
     } else {
-      if (current) lines.push(current)
-        current = w;
+      if (current) lines.push(current);
+      current = w;
     }
   }
-  if (current) lines.push(current)
-  return lines
+  if (current) lines.push(current);
+  return lines;
 }
 
 function bridgeRect(a: RoomId, b: RoomId) {

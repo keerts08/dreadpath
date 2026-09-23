@@ -43,8 +43,18 @@ type MobilePanel = "map" | "inventory" | "log" | "status" | null;
 
 function MapGlyph() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
-      <path d="M4 5 L9 3 L15 5 L20 3 V19 L15 21 L9 19 L4 21 Z" strokeLinejoin="round" />
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      aria-hidden
+    >
+      <path
+        d="M4 5 L9 3 L15 5 L20 3 V19 L15 21 L9 19 L4 21 Z"
+        strokeLinejoin="round"
+      />
       <path d="M9 3 V19 M15 5 V21" strokeDasharray="2 2" />
     </svg>
   );
@@ -52,7 +62,14 @@ function MapGlyph() {
 
 function BagGlyph() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      aria-hidden
+    >
       <path d="M7 8 V6 a5 5 0 0 1 10 0 v2" strokeLinecap="round" />
       <rect x="4" y="8" width="16" height="13" rx="1.5" />
     </svg>
@@ -61,7 +78,14 @@ function BagGlyph() {
 
 function LogGlyph() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      aria-hidden
+    >
       <path d="M5 6 H19 M5 12 H19 M5 18 H13" strokeLinecap="round" />
     </svg>
   );
@@ -69,15 +93,31 @@ function LogGlyph() {
 
 function PulseGlyph() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
-      <path d="M3 12 H8 L10 6 L14 18 L16 12 H21" strokeLinecap="round" strokeLinejoin="round" />
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      aria-hidden
+    >
+      <path
+        d="M3 12 H8 L10 6 L14 18 L16 12 H21"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </svg>
   );
 }
 
 function PauseGlyph() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor" aria-hidden>
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="currentColor"
+      aria-hidden
+    >
       <rect x="6" y="4" width="4" height="16" />
       <rect x="14" y="4" width="4" height="16" />
     </svg>
@@ -86,9 +126,19 @@ function PauseGlyph() {
 
 function HelpGlyph() {
   return (
-    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.4" aria-hidden>
+    <svg
+      viewBox="0 0 24 24"
+      className="h-4 w-4"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.4"
+      aria-hidden
+    >
       <circle cx="12" cy="12" r="9" />
-      <path d="M9.5 9.3 a2.5 2.5 0 1 1 3.5 2.3 c-1 0.5 -1 1.2 -1 2" strokeLinecap="round" />
+      <path
+        d="M9.5 9.3 a2.5 2.5 0 1 1 3.5 2.3 c-1 0.5 -1 1.2 -1 2"
+        strokeLinecap="round"
+      />
       <circle cx="12" cy="17" r="0.9" fill="currentColor" stroke="none" />
     </svg>
   );
@@ -156,11 +206,10 @@ export default function GameShell() {
   useEffect(() => {
     const onVisibility = () => {
       if (document.hidden && started && !ending) return;
-    } 
-    document.addEventListener("visibilitychange", onVisibility)
-    return() => document.removeEventListener("visibilitychange", onVisibility)
-
-  }, [started, ending])
+    };
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => document.removeEventListener("visibilitychange", onVisibility);
+  }, [started, ending]);
 
   const handleUseExit = useCallback(
     (exit: ExitDef) => {
@@ -188,9 +237,9 @@ export default function GameShell() {
 
   useEffect(() => {
     if (!started) {
-      router.replace("/")
+      router.replace("/");
     }
-  }, [started, router])
+  }, [started, router]);
 
   if (!hydrated) {
     return (
@@ -294,18 +343,18 @@ export default function GameShell() {
             </p>
             <p>
               Walk up to something and press E, or the on-screen E button, to
-              examine, take, or use it. Walking into a doorway moves you
-              through it.
+              examine, take, or use it. Walking into a doorway moves you through
+              it.
             </p>
             <p>
-              Something else is in the house. Noise draws it closer, and in
-              the wrong room it may start pursuing you for real — you&rsquo;ll
-              see it coming. Find a hiding spot and interact with it to duck
-              inside if it gets close.
+              Something else is in the house. Noise draws it closer, and in the
+              wrong room it may start pursuing you for real — you&rsquo;ll see
+              it coming. Find a hiding spot and interact with it to duck inside
+              if it gets close.
             </p>
             <p>
-              Your grip on things will fray the longer you stay, and faster
-              if you dwell on what you find. Read carefully.
+              Your grip on things will fray the longer you stay, and faster if
+              you dwell on what you find. Read carefully.
             </p>
           </div>
           <DialogFooter>

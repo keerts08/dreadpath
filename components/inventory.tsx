@@ -29,7 +29,7 @@ export default function Inventory({ items }: { items: ItemId[] }) {
             onClick={() => setActive(active === id ? null : id)}
             className={`border text-xs transition-colors ${active === id ? "border-amber text-amber" : "border-line text-ink-dim hover:border-ink-dim hover:text-ink"}`}
           >
-            <ItemIcon id={id} className="h-5 w-5"/>
+            <ItemIcon id={id} className="h-5 w-5" />
           </Button>
         ))}
       </div>

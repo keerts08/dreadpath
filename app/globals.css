@@ -338,7 +338,6 @@ body {
   animation: recPulse 1.4s ease-in-out infinite;
 }
 
-
 @keyframes recPulse {
   0%,
   100% {
