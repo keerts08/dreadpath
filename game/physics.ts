@@ -1,4 +1,4 @@
-import { RectZone, Vec2 } from "./types";
+import { HotspotZone, RectZone, Vec2 } from "./types";
 
 export function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
@@ -11,6 +11,16 @@ export function rectContains(zone: RectZone, p: Vec2, pad = 0) {
     p.y >= zone.y - pad &&
     p.y <= zone.y + zone.h + pad
   );
+}
+
+export function hotspotContains(hz: HotspotZone, p: Vec2, pad = 0) {
+  if (hz.shape === "circle") {
+    const cx = hz.zone.x + hz.zone.w / 2;
+    const cy = hz.zone.y + hz.zone.h / 2;
+    const r = Math.min(hz.zone.w, hz.zone.h) / 2;
+    return dist(p, { x: cx, y: cy }) <= r + pad;
+  }
+  return rectContains(hz.zone, p, pad);
 }
 
 export function dist(a: Vec2, b: Vec2) {

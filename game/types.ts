@@ -134,6 +134,7 @@ export interface DoorZone {
 export interface HotspotZone {
   hotspotId: string;
   zone: RectZone;
+  shape?: "circle";
 }
 
 export interface RoomLayout {

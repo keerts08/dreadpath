@@ -3,7 +3,8 @@
 import { RoomId } from "@/game/types";
 import { MAP_EDGES, MAP_GRID } from "@/game/mapLayout";
 import { ROOMS } from "@/game/world";
-import React, { useRef, useState } from "react";
+import React, { useId, useRef, useState } from "react";
+import { ROOM_ICONS } from "./map-icons";
 
 const CELL = 52;
 const GAP = 16;
@@ -15,6 +16,33 @@ const BASE_HALF = 190;
 
 function shortName(id: RoomId) {
   return ROOMS[id].name.replace(/^The /, "");
+}
+
+const BASE_LABEL_SIZE = 7.6;
+const LABEL_LINE_HEIGHT = 8;
+
+function estLabelWidth(s: string) {
+  return s.length * 0.6 * BASE_LABEL_SIZE + Math.max(0, s.length - 1) * 0.2;
+}
+
+function wrapLabel(label: string): string[] {
+  const maxWidth = UNIT - 4;
+  if (estLabelWidth(label) <= maxWidth) return [label];
+  const words = label.split(" ");
+  if (words.length < 2) return [label];
+  const lines: string[] = [];
+  let current = "";
+  for (const w of words) {
+    const c = current ? `${current} ${w}` : w;
+    if (estLabelWidth(c) <= maxWidth) {
+      current = c;
+    } else {
+      if (current) lines.push(current)
+        current = w;
+    }
+  }
+  if (current) lines.push(current)
+  return lines
 }
 
 function bridgeRect(a: RoomId, b: RoomId) {
@@ -43,6 +71,9 @@ function bridgeRect(a: RoomId, b: RoomId) {
   return null;
 }
 
+const ICON_SIZE = 19;
+const ICON_SCALE = ICON_SIZE / 24;
+
 export default function MapPanel({
   currentRoom,
   visitedRooms,
@@ -52,6 +83,7 @@ export default function MapPanel({
   visitedRooms: RoomId[];
   svgClassName?: string;
 }) {
+  const uid = useId();
   const [zoom, setZoom] = useState(1.1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const svgRef = useRef<SVGSVGElement>(null);
@@ -138,6 +170,39 @@ export default function MapPanel({
         onPointerUp={endDrag}
         onPointerLeave={endDrag}
       >
+        <defs>
+          <pattern
+            id={`grid-${uid}`}
+            width={UNIT / 2}
+            height={UNIT / 2}
+            patternUnits="userSpaceOnUse"
+          >
+            <circle cx={1} cy={1} r={1} fill="#2a2825" />
+          </pattern>
+          <filter
+            id={`glow-${uid}`}
+            x="-80%"
+            y="-80%"
+            width="260%"
+            height="260%"
+          >
+            <feGaussianBlur stdDeviation="5" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
+
+        <rect
+          x={-4000}
+          y={-4000}
+          width={8000}
+          height={8000}
+          fill={`url(#grid-${uid})`}
+          opacity={0.5}
+        />
+
         {MAP_EDGES.filter(({ a, b }) => known.has(a) && known.has(b)).map(
           ({ a, b }) => {
             const r = bridgeRect(a, b);
@@ -159,12 +224,29 @@ export default function MapPanel({
 
         {Array.from(known).map((id) => {
           const { col, row } = MAP_GRID[id];
-          const x = col * UNIT - CELL / 2;
-          const y = row * UNIT - CELL / 2;
+          const cx = col * UNIT;
+          const cy = row * UNIT;
+          const x = cx - CELL / 2;
+          const y = cy - CELL / 2;
           const isCurrent = id === currentRoom;
           const isVisited = visited.has(id);
+          const Icon = ROOM_ICONS[id];
           return (
             <g key={id}>
+              {isCurrent && (
+                <rect
+                  x={x}
+                  y={y}
+                  width={CELL}
+                  height={CELL}
+                  rx={6}
+                  fill="none"
+                  stroke="#b98a4a"
+                  strokeWidth={2}
+                  filter={`url(#glow-${uid})`}
+                  opacity={0.55}
+                />
+              )}
               <rect
                 x={x}
                 y={y}
@@ -173,7 +255,7 @@ export default function MapPanel({
                 rx={6}
                 fill={
                   isCurrent
-                    ? "rgba(185,138,74,0.28)"
+                    ? "rgba(185,138,74,0.24)"
                     : isVisited
                       ? "#1c1a17"
                       : "transparent"
@@ -184,16 +266,42 @@ export default function MapPanel({
                 strokeWidth={isCurrent ? 2 : 1.3}
                 strokeDasharray={isVisited ? undefined : "3 3"}
               />
-              {isVisited && (
-                <text
-                  x={col * UNIT}
-                  y={row * UNIT + 3}
-                  textAnchor="middle"
-                  fontSize={8.5}
-                  fill={isCurrent ? "#e0b57a" : "#8b8781"}
+              {isVisited && Icon && (
+                <g
+                  transform={`translate(${cx - ICON_SIZE / 2},${cy - CELL / 2 + 7}) scale(${ICON_SCALE})`}
+                  className={isCurrent ? "text-amber" : "text-ink-dim"}
+                  opacity={isCurrent ? 1 : 0.85}
                 >
-                  {shortName(id)}
-                </text>
+                  <Icon />
+                </g>
+              )}
+              {isVisited &&
+                wrapLabel(shortName(id)).map((line, i, lines) => (
+                  <text
+                    key={i}
+                    x={cx}
+                    y={
+                      y + CELL - 7 - (lines.length - 1 - i) * LABEL_LINE_HEIGHT
+                    }
+                    textAnchor="middle"
+                    fontSize={BASE_LABEL_SIZE}
+                    letterSpacing={0.2}
+                    fill={isCurrent ? "#e0b57a" : "#8b8781"}
+                  >
+                    {line}
+                  </text>
+                ))}
+              {isCurrent && (
+                <g transform={`translate(${x + CELL - 8},${y + 8})`}>
+                  <circle
+                    r={5}
+                    fill="none"
+                    stroke="#e0b57a"
+                    strokeWidth={1.4}
+                    className="map-ping"
+                  />
+                  <circle r={2.4} fill="#e0b57a" />
+                </g>
               )}
             </g>
           );

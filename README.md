@@ -47,5 +47,6 @@ then go to localhost:3000
 - used ai to add sm comp in /play
 - used ai for the audio generating
 - used ai for final bug finding
+- i forgot to list but i used ai trice more in sm files-
 
 made by keerthi
