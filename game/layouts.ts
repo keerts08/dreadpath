@@ -43,10 +43,17 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
       },
     ],
     hotspotZones: [
-      { hotspotId: "chandelier", zone: { x: 400, y: 120, w: 100, h: 70 } },
+      {
+        hotspotId: "chandelier",
+        zone: { x: 400, y: 120, w: 100, h: 70 },
+      },
       { hotspotId: "doorMechanism", zone: { x: 305, y: 400, w: 90, h: 50 } },
       { hotspotId: "placeWards", zone: { x: 405, y: 400, w: 90, h: 50 } },
-      { hotspotId: "speakName", zone: { x: 505, y: 400, w: 90, h: 50 } },
+      {
+        hotspotId: "speakName",
+        zone: { x: 505, y: 400, w: 90, h: 50 },
+        shape: "circle",
+      },
     ],
     entitySpawn: { x: 100, y: 100 },
   },
@@ -94,7 +101,11 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
     hotspotZones: [
       { hotspotId: "loreBooks", zone: { x: 350, y: 120, w: 120, h: 60 } },
       { hotspotId: "bookshelf", zone: { x: 550, y: 120, w: 120, h: 60 } },
-      { hotspotId: "sigilMoonSpot", zone: { x: 550, y: 190, w: 120, h: 50 } },
+      {
+        hotspotId: "sigilMoonSpot",
+        zone: { x: 550, y: 190, w: 120, h: 50 },
+        shape: "circle",
+      },
     ],
     entitySpawn: { x: 780, y: 420 },
   },
@@ -193,7 +204,11 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
       },
     ],
     hotspotZones: [
-      { hotspotId: "mirror", zone: { x: 300, y: 120, w: 80, h: 100 } },
+      {
+        hotspotId: "mirror",
+        zone: { x: 300, y: 120, w: 80, h: 100 },
+        shape: "circle",
+      },
       { hotspotId: "tub", zone: { x: 350, y: 330, w: 140, h: 80 } },
     ],
     entitySpawn: { x: 700, y: 400 },
@@ -266,7 +281,11 @@ export const LAYOUTS: Record<RoomId, RoomLayout> = {
     ],
     hotspotZones: [
       { hotspotId: "trunk", zone: { x: 360, y: 220, w: 120, h: 70 } },
-      { hotspotId: "trunkSigil", zone: { x: 500, y: 220, w: 90, h: 60 } },
+      {
+        hotspotId: "trunkSigil",
+        zone: { x: 500, y: 220, w: 90, h: 60 },
+        shape: "circle",
+      },
     ],
     entitySpawn: { x: 100, y: 120 },
   },

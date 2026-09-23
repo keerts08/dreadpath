@@ -291,18 +291,6 @@ export default function MapPanel({
                     {line}
                   </text>
                 ))}
-              {isCurrent && (
-                <g transform={`translate(${x + CELL - 8},${y + 8})`}>
-                  <circle
-                    r={5}
-                    fill="none"
-                    stroke="#e0b57a"
-                    strokeWidth={1.4}
-                    className="map-ping"
-                  />
-                  <circle r={2.4} fill="#e0b57a" />
-                </g>
-              )}
             </g>
           );
         })}

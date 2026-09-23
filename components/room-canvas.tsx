@@ -1,10 +1,18 @@
 "use client";
 
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
-import { ExitDef, HotspotDef, RoomDef, RoomLayout, Vec2 } from "@/game/types";
+import {
+  ExitDef,
+  HotspotDef,
+  RectZone,
+  RoomDef,
+  RoomLayout,
+  Vec2,
+} from "@/game/types";
 import {
   clamp,
   dist,
+  hotspotContains,
   lerpVec,
   moveWithCollision,
   rectContains,
@@ -281,7 +289,7 @@ export default function RoomCanvas({
         for (const hz of layout.hotspotZones) {
           const hotspotDef = room.hotspots.find((h) => h.id === hz.hotspotId);
           if (!hotspotDef || !hotspotVisible(hotspotDef, flags)) continue;
-          if (rectContains(hz.zone, playerPos.current, INTERACT_PAD)) {
+          if (hotspotContains(hz, playerPos.current, INTERACT_PAD)) {
             const cx = hz.zone.x + hz.zone.w / 2;
             const cy = hz.zone.y + hz.zone.h / 2;
             const d = Math.hypot(
@@ -410,9 +418,8 @@ function draw(
   for (const door of layout.doors) {
     const exitDef = room.exits.find((e) => e.label === door.exitLabel);
     if (!exitDef || !exitVisible(exitDef, flags)) continue;
-    ctx.fillStyle = "rgba(185,138,74,0.18)";
-    ctx.fillRect(door.zone.x, door.zone.y, door.zone.w, door.zone.h);
-    ctx.fillStyle = "rgba(201,197,189,0.55)";
+    drawDoor(ctx, door.zone);
+    ctx.fillStyle = "rgba(201,197,189,0.6)";
     ctx.textAlign = "center";
     ctx.fillText(
       exitDef.endsGameAs ? "the front door" : shortDoorLabel(exitDef.label),
@@ -433,9 +440,19 @@ function draw(
         : "rgba(185,138,74,0.1)";
     ctx.strokeStyle = isNear ? "#b98a4a" : "rgba(120,116,108,0.3)";
     ctx.lineWidth = isNear ? 2 : 1;
-    roundRect(ctx, hz.zone.x, hz.zone.y, hz.zone.w, hz.zone.h, 6);
-    ctx.fill();
-    ctx.stroke();
+    if (hz.shape === "circle") {
+      const ccx = hz.zone.x + hz.zone.w / 2;
+      const ccy = hz.zone.y + hz.zone.h / 2;
+      const r = Math.min(hz.zone.w, hz.zone.h) / 2;
+      ctx.beginPath();
+      ctx.arc(ccx, ccy, r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    } else {
+      roundRect(ctx, hz.zone.x, hz.zone.y, hz.zone.w, hz.zone.h, 6);
+      ctx.fill();
+      ctx.stroke();
+    }
     drawHotspotIcon(ctx, h.id, hz.zone, palette.accent, resolved, flags);
   }
 
@@ -485,6 +502,43 @@ function shortDoorLabel(label: string) {
     .replace(/^Return to the /i, "")
     .replace(/^Unlock the /i, "")
     .replace(/^Open the /i, "");
+}
+
+function drawDoor(ctx: CanvasRenderingContext2D, zone: RectZone) {
+  const horizontal = zone.w >= zone.h;
+
+  ctx.fillStyle = "rgba(18,14,9,0.6)";
+  ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+
+  ctx.strokeStyle = "rgba(185,138,74,0.55)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(zone.x + 1, zone.y + 1, zone.w - 2, zone.h - 2);
+
+  const inset = 5;
+  ctx.fillStyle = "rgba(185,138,74,0.16)";
+  ctx.fillRect(
+    zone.x + inset,
+    zone.y + inset,
+    zone.w - inset * 2,
+    zone.h - inset * 2,
+  );
+  ctx.strokeStyle = "rgba(185,138,74,0.3)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(
+    zone.x + inset,
+    zone.y + inset,
+    zone.w - inset * 2,
+    zone.h - inset * 2,
+  );
+
+  ctx.fillStyle = "rgba(224,181,122,0.65)";
+  ctx.beginPath();
+  if (horizontal) {
+    ctx.arc(zone.x + zone.w * 0.8, zone.y + zone.h / 2, 2.3, 0, Math.PI * 2);
+  } else {
+    ctx.arc(zone.x + zone.w / 2, zone.y + zone.h * 0.28, 2.3, 0, Math.PI * 2);
+  }
+  ctx.fill();
 }
 
 function roundRect(
