@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Cinzel, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -18,6 +18,15 @@ export const metadata: Metadata = {
   title: "Dreadpath",
   description:
     "You woke up somewhere you shouldn't be. Something else lives here.",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "Dreadpath",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#07080a",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

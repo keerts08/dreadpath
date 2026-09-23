@@ -102,10 +102,6 @@ export default function GameShell() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [paused, setPaused] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-  // Phone-landscape only: which docked panel (if any) is currently open
-  // over the game. Everything else — map, inventory, log, status — stays
-  // out of the way behind a small icon until tapped, so the canvas is what
-  // actually fills the screen instead of fighting three sidebars for room.
   const [mobilePanel, setMobilePanel] = useState<MobilePanel>(null);
 
   const started = useGameStore((s) => s.started);
@@ -156,6 +152,15 @@ export default function GameShell() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
+
+  useEffect(() => {
+    const onVisibility = () => {
+      if (document.hidden && started && !ending) return;
+    } 
+    document.addEventListener("visibilitychange", onVisibility)
+    return() => document.removeEventListener("visibilitychange", onVisibility)
+
+  }, [started, ending])
 
   const handleUseExit = useCallback(
     (exit: ExitDef) => {
